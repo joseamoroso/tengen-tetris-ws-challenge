@@ -1,7 +1,13 @@
 function setup() {
-    createCanvas(800, 800);
+  createCanvas(800, 600);
+
+  /* Create a client in solo mode. */
+  client = new Client(800, 600, mode='solo');
 }
 
 function draw() {
-  ellipse(50, 50, 80, 80);
+  background(0);
+
+  //client.update();
+  client.display();
 }

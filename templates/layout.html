@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<head>
+    <!-- Load the p5.js library to create sketches -->
+    <script src="https://cdn.jsdelivr.net/npm/p5"></script>
+
+    <!-- Main script for the canvas -->
+    <script src="{{ url_for('static', filename='sketch.js') }}"></script>
+
+    <!-- Load the various JavaScript files for the client -->
+    <script src="{{ url_for('static', filename='client.js') }}"></script>
+    <script src="{{ url_for('static', filename='classes.js') }}"></script>
+</head>
+<html>
+    <body>
+        <h1>
+            Tengen Tetris game
+        </h1>
+    </body>
+</html>
