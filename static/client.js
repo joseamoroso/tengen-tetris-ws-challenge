@@ -18,9 +18,22 @@ class Client {
         this.canvasHeight = canvasHeight;
         this.mode = mode;
 
-        /* Calculate the position of the new arena. */
-        this.arena = new Arena(0, 0, 400, 600);
+        /* Create only one arena while in solo mode. */
+		if (this.mode == 'solo') {
+			/* Expand all the possible height. */
+			let arenaHeight = this.canvasHeight;
+			let arenaWidth = 2 * arenaHeight / 3;
+			this.arena = new Arena((this.canvasWidth - arenaWidth) / 2, 0, arenaWidth, arenaHeight);
+		}
+		else if (this.mode == 'duo') {
+			/* TODO: create two arenas side by side. */
+		}
     }
+
+	/* Updates all the elements inside the arena. */
+	update() {
+		this.arena.update();
+	}
 
     display() {
         this.arena.display();

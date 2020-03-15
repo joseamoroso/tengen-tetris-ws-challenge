@@ -1,3 +1,6 @@
+/* The client object has all the logic for the game. */
+let client;
+
 function setup() {
   createCanvas(800, 600);
 
@@ -8,6 +11,6 @@ function setup() {
 function draw() {
   background(0);
 
-  //client.update();
+  client.update();
   client.display();
 }
