@@ -54,26 +54,27 @@ class Piece {
 		this.center = this.squares[0];
 	}
 
-	/* Moves the piece down if it can, depending on the situation of the grid. */
-	move(grid) {
-		/* Check if every piece can move down. */
+	/* Tries to move the piece in the requested direction. */
+	move(direction, grid) {
+		let canMove = true;
 		for (let k = 0; k < this.squares.length; k++) {
-			/* Check if this square is touching the floor. */
-			if (this.squares[k].i == 19) {
-				grid.receive(this);
-				return false;
-			}
-
-			/* Check if this square has available space right under. */
-			if (grid.squares[this.squares[k].i + 1][this.squares[k].j].visible) {
-				grid.receive(this);
-				return false;
+			if (!this.squares[k].canMove(direction, grid)) {
+				canMove = false;
+				break;
 			}
 		}
 
-		/* All the pieces can move, so move them down. */
+		/* If it cannot move down, let the grid take the piece. */
+		if (!canMove) {
+			if (direction == DIR_DOWN) {
+				grid.receive(this);
+			}
+			return false;
+		}
+
+		/* All the squares can move, so move them. */
 		for (let k = 0; k < this.squares.length; k++) {
-			this.squares[k].move(DIR_DOWN);
+			this.squares[k].move(direction);
 		}
 
 		return true;

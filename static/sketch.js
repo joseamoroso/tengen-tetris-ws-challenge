@@ -14,3 +14,8 @@ function draw() {
   client.update();
   client.display();
 }
+
+function keyPressed() {
+	client.keyPressed(keyCode);
+	return false;
+}

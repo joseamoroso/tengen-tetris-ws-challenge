@@ -23,6 +23,36 @@ class Square {
 		}
 	}
 
+	/* Receives a movement and a grid and simulates the movement inside the grid. */
+	canMove(direction, grid) {
+		let nexti, nextj;
+		if (direction == DIR_DOWN) {
+			nexti = this.i + 1;
+			nextj = this.j;
+		}
+		else if (direction == DIR_LEFT) {
+			nexti = this.i;
+			nextj = this.j - 1;
+		}
+		else if (direction == DIR_RIGHT) {
+			nexti = this.i;
+			nextj = this.j + 1;
+		}
+
+		/* Check the borders of the canvas */
+		if (!(0 <= nexti && nexti < 20) || !(0 <= nextj && nextj < 10)) {
+			return false;
+		}
+
+		/* Check if this position is already occupied in the grid. */
+		if (grid.squares[nexti][nextj].visible) {
+			return false;
+		}
+
+		/* At this point, the simulation was correct, the square can move. */
+		return true;
+	}
+
 	/* Displays this piece depending on the visibility. */
 	display(initialx, initialy, size) {
 		if (this.visible) {

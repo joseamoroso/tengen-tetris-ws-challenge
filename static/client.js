@@ -30,6 +30,11 @@ class Client {
 		}
     }
 
+	/* This function handles input from the keyboard. */
+	keyPressed(code) {
+		this.arena.keyPressed(code);
+	}
+
 	/* Updates all the elements inside the arena. */
 	update() {
 		this.arena.update();

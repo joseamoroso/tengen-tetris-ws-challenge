@@ -2,6 +2,7 @@ let DIR_DOWN = 'down'
 let DIR_RIGHT = 'right'
 let DIR_LEFT = 'left'
 
+/* This class handles all the information about only one player. */
 class Arena {
     constructor(initialx, initialy, width, height) {
         this.initialx = initialx;
@@ -41,7 +42,7 @@ class Arena {
 
 		/* Move the piece down if the time elapsed si enough. */
 		if (this.stopwatch.getElapsedTime() > 400) {
-			if (!this.piece.move(this.grid)) {
+			if (!this.piece.move(DIR_DOWN, this.grid)) {
 				/* The piece was not able to move, and has been dropped. */
 				this.createNewPiece();
 			}
@@ -53,6 +54,16 @@ class Arena {
 	/* Replaces the current falling piece with a new one. */
 	createNewPiece() {
 		this.piece = new Piece(this.possiblePieces[Math.floor(Math.random() * this.possiblePieces.length)]);
+	}
+
+	/* Handles input from the keyboard. */
+	keyPressed(code) {
+		if (code == LEFT_ARROW) {
+			this.piece.move(DIR_LEFT, this.grid);
+		}
+		else if (code == RIGHT_ARROW) {
+			this.piece.move(DIR_RIGHT, this.grid);
+		}
 	}
 
 	/* Displays all the elements in the arena. */
