@@ -1,8 +1,9 @@
+/* Define the directions of movement of the pieces. */
 let DIR_DOWN = 'down'
 let DIR_RIGHT = 'right'
 let DIR_LEFT = 'left'
 
-/* This class handles all the information about only one player. */
+/* This class handles the information about only one player. */
 class Arena {
 	constructor(initialx, initialy, width, height) {
 		this.initialx = initialx;
@@ -63,6 +64,9 @@ class Arena {
 		}
 		else if (code == RIGHT_ARROW) {
 			this.piece.move(DIR_RIGHT, this.grid);
+		}
+		else if (code == UP_ARROW) {
+			this.piece.rotate(this.grid);
 		}
 	}
 

@@ -21,15 +21,38 @@ class Grid {
 		}
 	}
 
-	/* Receives a piece and keeps it in the grid forever. */
+	/* Receives a piece and stores its squares. */
 	receive(piece) {
 		for (let k = 0; k < piece.squares.length; k++) {
 			this.squares[piece.squares[k].i][piece.squares[k].j].visible = true;
 		}
 	}
 
-	/* Display all the squares inside the grid. */
+	/* Decides if the position is valid inside the grid */
+	validPosition(i, j) {
+		/* Check the borders of the canvas */
+		if (!(0 <= i && i < 20) || !(0 <= j && j < 10)) {
+			return false;
+		}
+
+		/* Check if this position is already occupied in the grid. */
+		if (this.squares[i][j].visible) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/* Displays the contents of the grid. */
 	display () {
+		/* Display a border around the grid. */
+		stroke(255);
+		line(this.initialx, this.initialy, this.initialx + this.width, this.initialy);
+		line(this.initialx + this.width, this.initialy, this.initialx + this.width, this.initialy + this.height);
+		line(this.initialx + this.width, this.initialy + this.height, this.initialx, this.initialy + this.height);
+		line(this.initialx, this.initialy + this.height, this.initialx, this.initialy);
+
+		/* Display each of the squares */
 		for (let i = 0; i < this.squares.length; i++) {
 			for (let j = 0; j < this.squares[i].length; j++) {
 				this.squares[i][j].display(this.initialx, this.initialy, this.squareSize);

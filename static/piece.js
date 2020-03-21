@@ -1,10 +1,16 @@
 /* This is the tetromino piece. It begins at the top and moves down. */
 class Piece {
 	constructor(type) {
-		let centeri = 0, centerj = 5;
 		this.squares = [];
+		this.center = undefined;
+
+		/* If type is undefined, just create an empty piece. */
+		if (type == undefined) {
+			return;
+		}
 
 		/* Create a different piece depending on the type. */
+		let centeri = 0, centerj = 5;
 		switch (type) {
 			case 'T':
 				this.squares.push(new Square(centeri, centerj, true));
@@ -78,6 +84,36 @@ class Piece {
 		}
 
 		return true;
+	}
+
+	/* Rotates this piece inside the grid givem */
+	rotate(grid) {
+		/* Create a new piece that is this one rotated. */
+		let rotatedPiece = this.createRotatedPiece();
+		for (let k = 0; k < rotatedPiece.squares.length; k++) {
+			if (!grid.validPosition(rotatedPiece.squares[k].i, rotatedPiece.squares[k].j)) {
+				return false;
+			}
+		}
+
+		/* All the pieces are allowed to rotate, so copy the rotated piece into this one. */
+		for (let k = 0; k < this.squares.length; k++) {
+			this.squares[k] = rotatedPiece.squares[k];
+		}
+		this.center = rotatedPiece.center;
+	}
+
+	/* Returns a new piece with the squares of this one rotated. */
+	createRotatedPiece() {
+		let rotatedPiece = new Piece(undefined);
+		for (let k = 0; k < this.squares.length; k++) {
+			/* Rotate this square. */
+			let newSquare = this.squares[k].rotatedFrom(this.center);
+			rotatedPiece.squares.push(newSquare);
+		}
+		rotatedPiece.center = rotatedPiece.squares[0];
+
+		return rotatedPiece;
 	}
 
 	/* Displays this piece calling display on each of the squares. */

@@ -2,11 +2,9 @@
 in the falling piece. */
 class Square {
 	constructor(i, j, visible) {
-		/* Store some values. */
+		/* Store the values. */
 		this.i = i;
 		this.j = j;
-
-		/* Defines the type of square, visible or not. */
 		this.visible = visible;
 	}
 
@@ -23,7 +21,7 @@ class Square {
 		}
 	}
 
-	/* Receives a movement and a grid and simulates the movement inside the grid. */
+	/* Receives a movement and a grid and decides if the movement is allowed. */
 	canMove(direction, grid) {
 		let nexti, nextj;
 		if (direction == DIR_DOWN) {
@@ -39,13 +37,8 @@ class Square {
 			nextj = this.j + 1;
 		}
 
-		/* Check the borders of the canvas */
-		if (!(0 <= nexti && nexti < 20) || !(0 <= nextj && nextj < 10)) {
-			return false;
-		}
-
-		/* Check if this position is already occupied in the grid. */
-		if (grid.squares[nexti][nextj].visible) {
+		/* Validate the new positions in the grid. */
+		if (!grid.validPosition(nexti, nextj)) {
 			return false;
 		}
 
@@ -53,7 +46,14 @@ class Square {
 		return true;
 	}
 
-	/* Displays this piece depending on the visibility. */
+	/* Returns a new square that is this one rotated from the center given. */
+	rotatedFrom(center) {
+		let deltaX = this.j - center.j;
+		let deltaY = center.i - this.i;
+		return new Square(center.i + deltaX, center.j + deltaY, true);
+	}
+
+	/* Displays this square if visible. */
 	display(initialx, initialy, size) {
 		if (this.visible) {
 			fill(0, 255, 0);
