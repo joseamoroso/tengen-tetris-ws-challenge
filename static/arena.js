@@ -34,11 +34,18 @@ class Arena {
 
 		/* Variable that remembers if the down key is pressed. */
 		this.downKeyPressed = false;
+
+		/* Variable that remembers if the player has lost. */
+		this.lost = false;
 	}
 
 	/* Update all the elements inside the arena. This function
 	gets called in a loop. */
 	update() {
+		if (this.lost) {
+			return;
+		}
+
 		/* Create a new piece if needed. */
 		if (this.piece == undefined) {
 			this.createNewPiece();
@@ -63,8 +70,16 @@ class Arena {
 	movePieceDown() {
 		/* If the piece is not able to move down, replace the current piece. */
 		if (!this.piece.move(DIR_DOWN, this.grid)) {
-			/* The piece was not able to move, and has been dropped. */
+			/* The piece was not able to move down, so drop it in the grid. */
+			this.grid.receive(this.piece);
 			this.createNewPiece();
+
+			/* Assign score in the current grid and clean squares. */
+			this.grid.assignScoresAndClean();
+
+			/* Check if this player has lost. */
+			this.checkLose();
+			this.grid.assignScoresAndClean();
 			return false;
 		}
 
@@ -96,6 +111,18 @@ class Arena {
 		if (code == DOWN_ARROW) {
 			this.downKeyPressed = false;
 		}
+	}
+
+	/* Checks if this player has lost. */
+	checkLose() {
+		for (let j = 0; j < 10; j++) {
+			if (this.grid.squares[0][j].visible) {
+				this.lost = true;
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/* Displays all the elements in the arena. */

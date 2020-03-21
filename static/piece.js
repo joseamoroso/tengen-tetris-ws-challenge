@@ -62,20 +62,10 @@ class Piece {
 
 	/* Tries to move the piece in the requested direction. */
 	move(direction, grid) {
-		let canMove = true;
 		for (let k = 0; k < this.squares.length; k++) {
 			if (!this.squares[k].canMove(direction, grid)) {
-				canMove = false;
-				break;
+				return false;
 			}
-		}
-
-		/* If it cannot move down, let the grid take the piece. */
-		if (!canMove) {
-			if (direction == DIR_DOWN) {
-				grid.receive(this);
-			}
-			return false;
 		}
 
 		/* All the squares can move, so move them. */
