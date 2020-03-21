@@ -3,7 +3,7 @@ has been running. Each arena has a stopwatch that counts the time
 until the piece has to move down, according to its speed (which depends on the level). */
 class Stopwatch {
 	constructor() {
-	 	this.startTime = undefined;
+		this.startTime = undefined;
 		this.running = false;
 		this.elapsedTime = undefined;
 	}

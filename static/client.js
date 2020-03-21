@@ -3,22 +3,22 @@
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
     socket.on('connect', () => {
-        console.log('Socket connected correctly');
-        socket.emit('waitingToPlay', {'id': socket.id});
+	console.log('Socket connected correctly');
+	socket.emit('waitingToPlay', {'id': socket.id});
     });
 
     socket.on('ack', () => {
-        console.log('server has acknowlodged me');
+	console.log('server has acknowlodged me');
     })
 });*/
 
 class Client {
-    constructor(canvasWidth, canvasHeight, mode) {
-        this.canvasWidth = canvasWidth;
-        this.canvasHeight = canvasHeight;
-        this.mode = mode;
+	constructor(canvasWidth, canvasHeight, mode) {
+		this.canvasWidth = canvasWidth;
+		this.canvasHeight = canvasHeight;
+		this.mode = mode;
 
-        /* Create only one arena while in solo mode. */
+		/* Create only one arena while in solo mode. */
 		if (this.mode == 'solo') {
 			/* Expand all the possible height. */
 			let arenaHeight = this.canvasHeight;
@@ -28,7 +28,7 @@ class Client {
 		else if (this.mode == 'duo') {
 			/* TODO: create two arenas side by side. */
 		}
-    }
+	}
 
 	/* This function handles input from the keyboard. */
 	keyPressed(code) {
@@ -40,7 +40,7 @@ class Client {
 		this.arena.update();
 	}
 
-    display() {
-        this.arena.display();
-    }
+	display() {
+		this.arena.display();
+	}
 }
