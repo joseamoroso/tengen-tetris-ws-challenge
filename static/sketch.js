@@ -19,3 +19,8 @@ function keyPressed() {
 	client.keyPressed(keyCode);
 	return false;
 }
+
+function keyReleased() {
+	client.keyReleased(keyCode);
+	return false;
+}

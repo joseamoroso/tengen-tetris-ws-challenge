@@ -31,6 +31,9 @@ class Arena {
     of the falling piece. */
 		this.stopwatch = new Stopwatch();
 		this.stopwatch.start();
+
+		/* Variable that remembers if the down key is pressed. */
+		this.downKeyPressed = false;
 	}
 
 	/* Update all the elements inside the arena. This function
@@ -41,15 +44,31 @@ class Arena {
 			this.createNewPiece();
 		}
 
-		/* Move the piece down if the time elapsed si enough. */
-		if (this.stopwatch.getElapsedTime() > 400) {
-			if (!this.piece.move(DIR_DOWN, this.grid)) {
-				/* The piece was not able to move, and has been dropped. */
-				this.createNewPiece();
+		/* If the down key is pressed, directly try to move the piece. */
+		if (this.downKeyPressed) {
+			if (this.stopwatch.getElapsedTime() > 25) {
+				this.movePieceDown();
+				this.stopwatch.reset();
+				this.stopwatch.start();
 			}
+		}
+		else if (this.stopwatch.getElapsedTime() > 400) {
+			this.movePieceDown();
 			this.stopwatch.reset();
 			this.stopwatch.start();
 		}
+	}
+
+	/* Logic for the piece moving down. */
+	movePieceDown() {
+		/* If the piece is not able to move down, replace the current piece. */
+		if (!this.piece.move(DIR_DOWN, this.grid)) {
+			/* The piece was not able to move, and has been dropped. */
+			this.createNewPiece();
+			return false;
+		}
+
+		return true;
 	}
 
 	/* Replaces the current falling piece with a new one. */
@@ -67,6 +86,15 @@ class Arena {
 		}
 		else if (code == UP_ARROW) {
 			this.piece.rotate(this.grid);
+		}
+		else if (code == DOWN_ARROW) {
+			this.downKeyPressed = true;
+		}
+	}
+
+	keyReleased(code) {
+		if (code == DOWN_ARROW) {
+			this.downKeyPressed = false;
 		}
 	}
 

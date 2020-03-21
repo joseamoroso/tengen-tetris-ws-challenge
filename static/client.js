@@ -30,9 +30,14 @@ class Client {
 		}
 	}
 
-	/* This function handles input from the keyboard. */
+	/* Gets called when a key is pressed. */
 	keyPressed(code) {
 		this.arena.keyPressed(code);
+	}
+
+	/* Gets called when a key is released. */
+	keyReleased(code) {
+		this.arena.keyReleased(code);
 	}
 
 	/* Updates all the elements inside the arena. */
