@@ -6,10 +6,11 @@ class Piece {
 
 		/* If type is undefined, just create an empty piece. */
 		if (type == undefined) {
+			console.log('Creating an uninitialized piece.');
 			return;
 		}
 
-		/* Create a different piece depending on the type. */
+		/* If a type was provided, create the piece of the appropriate type. */
 		let centeri = 0, centerj = 5;
 		switch (type) {
 			case 'T':
@@ -68,7 +69,7 @@ class Piece {
 			}
 		}
 
-		/* All the squares can move, so move them. */
+		/* All the squares can move, so the piece can move. */
 		for (let k = 0; k < this.squares.length; k++) {
 			this.squares[k].move(direction);
 		}
@@ -76,7 +77,7 @@ class Piece {
 		return true;
 	}
 
-	/* Rotates this piece inside the grid givem */
+	/* Tries to rotate this piece inside the grid provided. */
 	rotate(grid) {
 		/* Create a new piece that is this one rotated. */
 		let rotatedPiece = this.createRotatedPiece();
@@ -86,7 +87,7 @@ class Piece {
 			}
 		}
 
-		/* All the pieces are allowed to rotate, so copy the rotated piece into this one. */
+		/* All the squares occupy valid positions, so copy the rotated piece into this one. */
 		for (let k = 0; k < this.squares.length; k++) {
 			this.squares[k] = rotatedPiece.squares[k];
 		}

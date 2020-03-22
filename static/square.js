@@ -1,5 +1,4 @@
-/* This class represents each of the squares in the grid or
-in the falling piece. */
+/* These are each of the squares that form the grid or the falling pieces. */
 class Square {
 	constructor(i, j, visible) {
 		/* Store the values. */
@@ -19,6 +18,9 @@ class Square {
 		else if (direction == DIR_LEFT) {
 			this.j -= 1;
 		}
+		else {
+			console.log('Cannot move in the required direction. Direction unexpected.');
+		}
 	}
 
 	/* Receives a movement and a grid and decides if the movement is allowed. */
@@ -35,6 +37,10 @@ class Square {
 		else if (direction == DIR_RIGHT) {
 			nexti = this.i;
 			nextj = this.j + 1;
+		}
+		else {
+			console.log('Unexpected direction.');
+			return false;
 		}
 
 		/* Validate the new positions in the grid. */
@@ -53,11 +59,12 @@ class Square {
 		return new Square(center.i + deltaX, center.j + deltaY, true);
 	}
 
-	/* Displays this square if visible. */
+	/* Displays this square if visible. Receives the sizes of the grid. */
 	display(initialx, initialy, size) {
 		if (this.visible) {
 			fill(0, 255, 0);
 			stroke(0);
+			strokeWeight(3);
 			rect(initialx + this.j * size, initialy + this.i * size, size, size);
 		}
 	}

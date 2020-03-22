@@ -1,4 +1,4 @@
-/* This is the main grid for Tetris, where the squares that fall to the floor
+/* This is the main grid for Tetris, 20x10, where the squares that fall to the floor
 are stored. */
 class Grid {
 	constructor(initialx, initialy, width, height) {
@@ -12,23 +12,23 @@ class Grid {
 		this.squareSize = this.width / 10;
 
 		/* Create a double array to store the squares. */
-		this.squares = [20];
+		this.squares = [];
 		for (let i = 0; i < 20; i++) {
-			this.squares[i] = [];
+			this.squares.push([]);
 			for (let j = 0; j < 10; j++) {
 				this.squares[i].push(new Square(i, j, false));
 			}
 		}
 	}
 
-	/* Receives a piece and stores its squares. */
+	/* Receives a piece and keeps its squares. */
 	receive(piece) {
 		for (let k = 0; k < piece.squares.length; k++) {
 			this.squares[piece.squares[k].i][piece.squares[k].j].visible = true;
 		}
 	}
 
-	/* Decides if the position is valid inside the grid */
+	/* Decides if the position is valid inside the grid. */
 	validPosition(i, j) {
 		/* Check the borders of the canvas */
 		if (!(0 <= i && i < 20) || !(0 <= j && j < 10)) {
@@ -68,20 +68,28 @@ class Grid {
 		return this.getScore(fullLines);
 	}
 
-	/* Clears the full lines given as indexes. Whenever a line is cleared, the
+	/* Cleans the full lines given as indexes. Whenever a line is cleared, the
 	grid moves downwards. */
 	cleanLines(fullLines) {
 		for (let i = 0; i < fullLines.length; i++) {
 			/* Iterate from the current line to the top. */
-			for (let k = fullLines[i]; k >= 1; k--) {
-				/* Copy the (k-1)-th line into the k-th line. */
+			for (let k = fullLines[i]; k >= 0; k--) {
+
 				for (let j = 0; j < 10; j++) {
-					this.squares[k][j].visible = this.squares[k - 1][j].visible;
+					/* If not the first row, copy the (k-1)-th line into the k-th line. */
+					if (k != 0) {
+						this.squares[k][j].visible = this.squares[k - 1][j].visible;
+					}
+					/* Set the first row black. */
+					else {
+						this.squares[k][j].visible = false;
+					}
 				}
 			}
 		}
 	}
 
+	/* Receives the list of full lines and assigns a score. */
 	getScore(fullLines) {
 		/* Get the groups of lines that are next to each other. */
 		let groupLines = [];
@@ -98,6 +106,7 @@ class Grid {
 			}
 		}
 
+		/* Assign score depending on the number of lines cleared together. */
 		let score = 0;
 		for (let k = 0; k < groupLines.length; k++) {
 			if (groupLines[k] == 1) {
@@ -119,18 +128,19 @@ class Grid {
 
 	/* Displays the contents of the grid. */
 	display () {
-		/* Display a border around the grid. */
-		stroke(255);
-		line(this.initialx, this.initialy, this.initialx + this.width, this.initialy);
-		line(this.initialx + this.width, this.initialy, this.initialx + this.width, this.initialy + this.height);
-		line(this.initialx + this.width, this.initialy + this.height, this.initialx, this.initialy + this.height);
-		line(this.initialx, this.initialy + this.height, this.initialx, this.initialy);
-
 		/* Display each of the squares */
 		for (let i = 0; i < this.squares.length; i++) {
 			for (let j = 0; j < this.squares[i].length; j++) {
 				this.squares[i][j].display(this.initialx, this.initialy, this.squareSize);
 			}
 		}
+
+		/* Display a border around the grid. */
+		stroke(255);
+		strokeWeight(3);
+		line(this.initialx, this.initialy, this.initialx + this.width, this.initialy);
+		line(this.initialx + this.width, this.initialy, this.initialx + this.width, this.initialy + this.height);
+		line(this.initialx + this.width, this.initialy + this.height, this.initialx, this.initialy + this.height);
+		line(this.initialx, this.initialy + this.height, this.initialx, this.initialy);
 	}
 }

@@ -3,7 +3,7 @@ let DIR_DOWN = 'down'
 let DIR_RIGHT = 'right'
 let DIR_LEFT = 'left'
 
-/* This class handles the information about only one player. */
+/* The arena handles all the information about one player. */
 class Arena {
 	constructor(initialx, initialy, width, height) {
 		this.initialx = initialx;
@@ -24,19 +24,18 @@ class Arena {
 		let gridInitialy = this.initialy + 2 * this.height / 10;
 		this.grid = new Grid(gridInitialx, gridInitialy, gridWidth, gridHeight);
 
-		/* Create the current piece, the one falling right now. */
+		/* Create the falling piece. */
 		this.piece = undefined;
 
 		/* Create a stopwatch to keep track of the timing of the animation
     of the falling piece. */
 		this.stopwatch = new Stopwatch();
-		this.stopwatch.start();
 
-		/* Variable that remembers if the down key is pressed. */
+		/* Variables for the logic of the game. */
 		this.downKeyPressed = false;
-
-		/* Variable that remembers if the player has lost. */
 		this.lost = false;
+		this.score = 0;
+		this.lines = 0;
 	}
 
 	/* Update all the elements inside the arena. This function
@@ -46,7 +45,7 @@ class Arena {
 			return;
 		}
 
-		/* Create a new piece if needed. */
+		/* Create a piece if needed. */
 		if (this.piece == undefined) {
 			this.createNewPiece();
 		}
@@ -55,14 +54,10 @@ class Arena {
 		if (this.downKeyPressed) {
 			if (this.stopwatch.getElapsedTime() > 25) {
 				this.movePieceDown();
-				this.stopwatch.reset();
-				this.stopwatch.start();
 			}
 		}
 		else if (this.stopwatch.getElapsedTime() > 400) {
 			this.movePieceDown();
-			this.stopwatch.reset();
-			this.stopwatch.start();
 		}
 	}
 
@@ -72,23 +67,24 @@ class Arena {
 		if (!this.piece.move(DIR_DOWN, this.grid)) {
 			/* The piece was not able to move down, so drop it in the grid. */
 			this.grid.receive(this.piece);
-			this.createNewPiece();
+			this.piece = undefined;
 
 			/* Assign score in the current grid and clean squares. */
 			this.grid.assignScoresAndClean();
 
 			/* Check if this player has lost. */
 			this.checkLose();
-			this.grid.assignScoresAndClean();
 			return false;
 		}
 
+		this.stopwatch.start();
 		return true;
 	}
 
-	/* Replaces the current falling piece with a new one. */
+	/* Replaces the current falling piece with a new one and starts the stopwatch. */
 	createNewPiece() {
 		this.piece = new Piece(this.possiblePieces[Math.floor(Math.random() * this.possiblePieces.length)]);
+		this.stopwatch.start();
 	}
 
 	/* Handles input from the keyboard. */
@@ -137,12 +133,12 @@ class Arena {
 		/* Display the message board. */
 		this.messageBoard.display();
 
-		/* Display the grid. */
-		this.grid.display();
-
 		/* Display the falling piece. */
 		if (this.piece != undefined) {
 			this.piece.display(this.grid.initialx, this.grid.initialy, this.grid.squareSize);
 		}
+
+		/* Display the grid. */
+		this.grid.display();
 	}
 }
