@@ -1,6 +1,6 @@
 /* Class that represents a simple text box that can be displayed. */
 class MessageBoard {
-	constructor(initialx, initialy, width, height) {
+	constructor(initialx, initialy, width, height, initialMessage) {
 		/* Store values. */
 		this.initialx = initialx;
 		this.initialy = initialy;
@@ -12,7 +12,12 @@ class MessageBoard {
 		this.centery = this.initialy + this.height / 2;
 
 		/* A message board has a message that it can display. */
-		this.message = 'Hello';
+		if (initialMessage === undefined) {
+			this.message = '';
+		}
+		else {
+			this.message = initialMessage;
+		}
 	}
 
 	/* Replaces the old message with a new one. */
@@ -24,7 +29,14 @@ class MessageBoard {
 	display() {
 		fill(255);
 		noStroke();
-		textAlign(CENTER);
+		textSize(16);
+		textAlign(CENTER, CENTER);
 		text(this.message, this.centerx, this.centery);
+
+		stroke(255);
+		line(this.initialx, this.initialy, this.initialx + this.width, this.initialy);
+		line(this.initialx + this.width, this.initialy, this.initialx + this.width, this.initialy + this.height);
+		line(this.initialx + this.width, this.initialy + this.height, this.initialx, this.initialy + this.height);
+		line(this.initialx, this.initialy + this.height, this.initialx, this.initialy);
 	}
 }

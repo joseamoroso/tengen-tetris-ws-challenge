@@ -64,8 +64,9 @@ class Grid {
 			}
 		}
 
+		/* Clean the full lines and return the score. */
 		this.cleanLines(fullLines);
-		return this.getScore(fullLines);
+		return this.getScoreAndLines(fullLines);
 	}
 
 	/* Cleans the full lines given as indexes. Whenever a line is cleared, the
@@ -90,21 +91,31 @@ class Grid {
 	}
 
 	/* Receives the list of full lines and assigns a score. */
-	getScore(fullLines) {
+	getScoreAndLines(fullLines) {
 		/* Get the groups of lines that are next to each other. */
-		let groupLines = [];
-		let currentGroup = 0;
-		groupLines.push(1);
-		for (let i = 1; i < fullLines.length; i++) {
-			if (fullLines[i] == fullLines[i - 1] + 1) {
-				/* Lines are consecutive. */
-				groupLines[currentGroup] += 1;
-			}
-			else {
-				groupLines.push(1);
-				currentGroup += 1;
+		let groupLines;
+		if (fullLines.length != 0) {
+			groupLines = [1];
+			let currentGroup = 0;
+			for (let i = 1; i < fullLines.length; i++) {
+				if (fullLines[i] == fullLines[i - 1] + 1) {
+					/* Lines are consecutive. */
+					if (typeof groupLines[currentGroup] === 'undefined') {
+						groupLines.push(2);
+					}
+					else {
+						groupLines[currentGroup] += 1;
+					}
+				}
+				else {
+					currentGroup += 1;
+				}
 			}
 		}
+		else {
+			groupLines = [];
+		}
+
 
 		/* Assign score depending on the number of lines cleared together. */
 		let score = 0;
@@ -123,7 +134,10 @@ class Grid {
 			}
 		}
 
-		return score;
+		return {
+			'score': score,
+			'lines': fullLines.length
+		};
 	}
 
 	/* Displays the contents of the grid. */

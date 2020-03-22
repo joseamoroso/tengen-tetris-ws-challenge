@@ -14,10 +14,14 @@ class Arena {
 		/* Store the list of possible Tetris pieces. */
 		this.possiblePieces = ['T', 'J', 'Z', 'O', 'S', 'L', 'I'];
 
-		/* Create a message board at the top. */
-		this.messageBoard = new MessageBoard(initialx, initialy, width, height / 10);
+		/* Create a text message board at the top. */
+		this.messageBoard = new MessageBoard(initialx, initialy, width, height / 10, 'hello');
 
-		/* Create the grid itself in the space remaining, at the bottom of that space. */
+		/* Create a score board at the top left of the arena. */
+		let scoreLinesMessage = 'SCORE: 0\nLINES: 0';
+		this.scoreLinesBoard = new MessageBoard(initialx, initialy + height / 10, width / 2, height / 10, scoreLinesMessage);
+
+		/* Create the grid itself in the bottom space remaining. */
 		let gridHeight = 8 * this.height / 10;
 		let gridWidth = gridHeight / 2;
 		let gridInitialx = this.initialx + (this.width - gridWidth) / 2;
@@ -70,7 +74,10 @@ class Arena {
 			this.piece = undefined;
 
 			/* Assign score in the current grid and clean squares. */
-			this.grid.assignScoresAndClean();
+			let result = this.grid.assignScoresAndClean();
+			this.score += result['score'];
+			this.lines += result['lines'];
+			this.updateScoreLinesBoard();
 
 			/* Check if this player has lost. */
 			this.checkLose();
@@ -121,6 +128,12 @@ class Arena {
 		return false;
 	}
 
+	/* Updates the score and lines board with the new values. */
+	updateScoreLinesBoard() {
+		let message = 'SCORE: ' + this.score + '\nLINES: ' + this.lines;
+		this.scoreLinesBoard.changeMessage(message);
+	}
+
 	/* Displays all the elements in the arena. */
 	display() {
 		/* Display a white border around the arena. */
@@ -132,6 +145,9 @@ class Arena {
 
 		/* Display the message board. */
 		this.messageBoard.display();
+
+		/* Display the score and lines board. */
+		this.scoreLinesBoard.display();
 
 		/* Display the falling piece. */
 		if (this.piece != undefined) {
