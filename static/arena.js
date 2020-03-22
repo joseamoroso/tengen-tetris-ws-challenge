@@ -3,6 +3,13 @@ let DIR_DOWN = 'down'
 let DIR_RIGHT = 'right'
 let DIR_LEFT = 'left'
 
+let POINTS = {
+	1: 40,
+	2: 100,
+	3: 300,
+	4: 1200
+};
+
 /* The arena handles all the information about one player. */
 class Arena {
 	constructor(initialx, initialy, width, height) {
@@ -17,9 +24,13 @@ class Arena {
 		/* Create a text message board at the top. */
 		this.messageBoard = new MessageBoard(initialx, initialy, width, height / 10, 'hello');
 
+		/* Create a level board at the left of the arena. */
+		let initialLevelBoardMessage = 'LEVEL: 0';
+		this.levelBoard = new MessageBoard(initialx, initialy + height / 10, width / 3, height / 10, initialLevelBoardMessage);
+
 		/* Create a score board at the top left of the arena. */
 		let scoreLinesMessage = 'SCORE: 0\nLINES: 0';
-		this.scoreLinesBoard = new MessageBoard(initialx, initialy + height / 10, width / 2, height / 10, scoreLinesMessage);
+		this.scoreLinesBoard = new MessageBoard(initialx + width / 3, initialy + height / 10, width / 3, height / 10, scoreLinesMessage);
 
 		/* Create the grid itself in the bottom space remaining. */
 		let gridHeight = 8 * this.height / 10;
@@ -36,6 +47,7 @@ class Arena {
 		this.stopwatch = new Stopwatch();
 
 		/* Variables for the logic of the game. */
+		this.level = 0;
 		this.downKeyPressed = false;
 		this.lost = false;
 		this.score = 0;
@@ -78,6 +90,9 @@ class Arena {
 			this.score += result['score'];
 			this.lines += result['lines'];
 			this.updateScoreLinesBoard();
+
+			/* Check if the player has to change level. */
+			this.checkLevel();
 
 			/* Check if this player has lost. */
 			this.checkLose();
@@ -128,10 +143,21 @@ class Arena {
 		return false;
 	}
 
+	/* Checks if the player has cleared lines so as to change level. */
+	checkLevel() {
+		this.level = Math.floor(this.lines / 10);
+		this.updateLevelBoard();
+	}
+
 	/* Updates the score and lines board with the new values. */
 	updateScoreLinesBoard() {
 		let message = 'SCORE: ' + this.score + '\nLINES: ' + this.lines;
 		this.scoreLinesBoard.changeMessage(message);
+	}
+
+	/* Updates the level board after a change in level. */
+	updateLevelBoard() {
+		this.levelBoard.changeMessage('LEVEL: ' + this.level);
 	}
 
 	/* Displays all the elements in the arena. */
@@ -143,10 +169,9 @@ class Arena {
 		line(this.initialx + this.width, this.initialy + this.height, this.initialx, this.initialy + this.height);
 		line(this.initialx, this.initialy + this.height, this.initialx, this.initialy);
 
-		/* Display the message board. */
+		/* Display the message boards at the top. */
 		this.messageBoard.display();
-
-		/* Display the score and lines board. */
+		this.levelBoard.display();
 		this.scoreLinesBoard.display();
 
 		/* Display the falling piece. */

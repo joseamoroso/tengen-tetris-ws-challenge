@@ -120,18 +120,7 @@ class Grid {
 		/* Assign score depending on the number of lines cleared together. */
 		let score = 0;
 		for (let k = 0; k < groupLines.length; k++) {
-			if (groupLines[k] == 1) {
-				score += 40;
-			}
-			else if (groupLines[k] == 2) {
-				score += 100;
-			}
-			else if (groupLines[k] == 3) {
-				score += 300;
-			}
-			else if (groupLines[k] == 4) {
-				score += 1200;
-			}
+			score += POINTS[groupLines[k]];
 		}
 
 		return {
