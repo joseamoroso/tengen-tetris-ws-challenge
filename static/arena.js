@@ -24,23 +24,24 @@ class Arena {
 		/* Create a text message board at the top. */
 		this.messageBoard = new MessageBoard(initialx, initialy, width, height / 10, 'hello');
 
-		/* Create a level board at the left of the arena. */
+		/* Create a grid on the left panel. */
+		let gridHeight = 9 * height / 10;
+		this.grid = new Grid(initialx, initialy + height / 10, gridHeight / 2, gridHeight);
+
+		/* Create the message boards on the right panel. */
+		let initialxRightPanel = initialx + gridHeight / 2;
+		let initialyRightPanel = initialy + height / 10;
+		let heightRightPanel = 9 * height / 10;
+		let widthRightPanel = width - (heightRightPanel / 2);
 		let initialLevelBoardMessage = 'LEVEL: 0';
-		this.levelBoard = new MessageBoard(initialx, initialy + height / 10, width / 3, height / 10, initialLevelBoardMessage);
-
-		/* Create a score board at the top left of the arena. */
+		this.levelBoard = new MessageBoard(initialxRightPanel, initialyRightPanel, widthRightPanel, heightRightPanel / 8, initialLevelBoardMessage);
 		let scoreLinesMessage = 'SCORE: 0\nLINES: 0';
-		this.scoreLinesBoard = new MessageBoard(initialx + width / 3, initialy + height / 10, width / 3, height / 10, scoreLinesMessage);
+		this.scoreLinesBoard = new MessageBoard(initialxRightPanel, initialyRightPanel + heightRightPanel / 8, widthRightPanel, heightRightPanel / 8, scoreLinesMessage);
+		this.nextPieceBoard = new NextPieceBoard(initialxRightPanel, initialyRightPanel + heightRightPanel / 4, widthRightPanel, heightRightPanel / 4);
 
-		/* Create the grid itself in the bottom space remaining. */
-		let gridHeight = 8 * this.height / 10;
-		let gridWidth = gridHeight / 2;
-		let gridInitialx = this.initialx + (this.width - gridWidth) / 2;
-		let gridInitialy = this.initialy + 2 * this.height / 10;
-		this.grid = new Grid(gridInitialx, gridInitialy, gridWidth, gridHeight);
-
-		/* Create the falling piece. */
+		/* Create the current piece and the next piece. */
 		this.piece = undefined;
+		this.nextPiece = undefined;
 
 		/* Create a stopwatch to keep track of the timing of the animation
     of the falling piece. */
@@ -61,9 +62,16 @@ class Arena {
 			return;
 		}
 
-		/* Create a piece if needed. */
+		/* Create pieces if not defined. */
+		if (this.nextPiece == undefined) {
+			this.nextPiece = this.createNewPiece();
+			this.nextPieceBoard.updatePiece(this.nextPiece);
+		}
 		if (this.piece == undefined) {
-			this.createNewPiece();
+			this.piece = new Piece(undefined);
+			this.piece.getValuesFrom(this.nextPiece);
+			this.nextPiece = undefined;
+			this.stopwatch.start();
 		}
 
 		/* If the down key is pressed, directly try to move the piece. */
@@ -105,8 +113,7 @@ class Arena {
 
 	/* Replaces the current falling piece with a new one and starts the stopwatch. */
 	createNewPiece() {
-		this.piece = new Piece(this.possiblePieces[Math.floor(Math.random() * this.possiblePieces.length)]);
-		this.stopwatch.start();
+		return new Piece(this.possiblePieces[Math.floor(Math.random() * this.possiblePieces.length)]);
 	}
 
 	/* Handles input from the keyboard. */
@@ -169,10 +176,11 @@ class Arena {
 		line(this.initialx + this.width, this.initialy + this.height, this.initialx, this.initialy + this.height);
 		line(this.initialx, this.initialy + this.height, this.initialx, this.initialy);
 
-		/* Display the message boards at the top. */
+		/* Display the top message board and the boards on the right panel. */
 		this.messageBoard.display();
 		this.levelBoard.display();
 		this.scoreLinesBoard.display();
+		this.nextPieceBoard.display();
 
 		/* Display the falling piece. */
 		if (this.piece != undefined) {

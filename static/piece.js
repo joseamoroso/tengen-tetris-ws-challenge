@@ -88,10 +88,7 @@ class Piece {
 		}
 
 		/* All the squares occupy valid positions, so copy the rotated piece into this one. */
-		for (let k = 0; k < this.squares.length; k++) {
-			this.squares[k] = rotatedPiece.squares[k];
-		}
-		this.center = rotatedPiece.center;
+		this.getValuesFrom(rotatedPiece);
 	}
 
 	/* Returns a new piece with the squares of this one rotated. */
@@ -105,6 +102,15 @@ class Piece {
 		rotatedPiece.center = rotatedPiece.squares[0];
 
 		return rotatedPiece;
+	}
+
+	/* Copies the values from the piece given as an argument. */
+	getValuesFrom(piece) {
+		this.squares = [];
+		for (let k = 0; k < piece.squares.length; k++) {
+			this.squares.push(new Square(piece.squares[k].i, piece.squares[k].j, true));
+		}
+		this.center = this.squares[0];
 	}
 
 	/* Displays this piece calling display on each of the squares. */
