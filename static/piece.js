@@ -3,6 +3,7 @@ class Piece {
 	constructor(type) {
 		this.squares = [];
 		this.center = undefined;
+		this.type = undefined;
 
 		/* If type is undefined, just create an empty piece. */
 		if (type == undefined) {
@@ -12,6 +13,7 @@ class Piece {
 
 		/* If a type was provided, create the piece of the appropriate type. */
 		let centeri = 0, centerj = 5;
+		this.type = type;
 		switch (type) {
 			case 'T':
 				this.squares.push(new Square(centeri, centerj, true));

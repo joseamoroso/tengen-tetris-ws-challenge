@@ -38,6 +38,7 @@ class Arena {
 		let scoreLinesMessage = 'SCORE: 0\nLINES: 0';
 		this.scoreLinesBoard = new MessageBoard(initialxRightPanel, initialyRightPanel + heightRightPanel / 8, widthRightPanel, heightRightPanel / 8, scoreLinesMessage);
 		this.nextPieceBoard = new NextPieceBoard(initialxRightPanel, initialyRightPanel + heightRightPanel / 4, widthRightPanel, heightRightPanel / 4);
+		this.statBoard = new StatBoard(initialxRightPanel, initialyRightPanel + heightRightPanel / 2, widthRightPanel, heightRightPanel / 2, this.possiblePieces);
 
 		/* Create the current piece and the next piece. */
 		this.piece = undefined;
@@ -66,6 +67,7 @@ class Arena {
 		if (this.nextPiece == undefined) {
 			this.nextPiece = this.createNewPiece();
 			this.nextPieceBoard.updatePiece(this.nextPiece);
+			this.statBoard.updateCounts(this.nextPiece.type);
 		}
 		if (this.piece == undefined) {
 			this.piece = new Piece(undefined);
@@ -181,6 +183,7 @@ class Arena {
 		this.levelBoard.display();
 		this.scoreLinesBoard.display();
 		this.nextPieceBoard.display();
+		this.statBoard.display();
 
 		/* Display the falling piece. */
 		if (this.piece != undefined) {
