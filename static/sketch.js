@@ -2,7 +2,10 @@
 let client;
 
 function setup() {
-	createCanvas(800, 600);
+	let canvas = createCanvas(800, 600);
+
+	/* Move the canvas to the appropriate div element. */
+	canvas.parent('sketch-holder');
 
 	/* Create a client in solo mode. */
 	client = new Client(800, 600, mode='solo');
