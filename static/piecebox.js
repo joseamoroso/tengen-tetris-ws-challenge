@@ -1,11 +1,26 @@
-/* This is a little box where a piece can be represented. */
+/* This is a little box where a piece can be represented (for stats and next boxes). */
 class PieceBox extends ElementBox {
-	constructor(initialx, initialy, width) {
+	constructor(initialx, initialy, width, height) {
 		/* Call the superclass constructor. */
-		super(initialx, initialy, width, width / 2, false);
+		super(initialx, initialy, width, height, false);
+
+		/* Calculate limits for the piece inside this box. */
+		let pieceWidth, pieceHeight;
+		if (width > 2 * height) {
+			/* The limiting dimension is the height. */
+			pieceHeight = (80 / 100) * height;
+			pieceWidth = pieceHeight * 2;
+		}
+		else {
+			/* The limiting dimension is the width. */
+			pieceWidth = (80 / 100) * width;
+			pieceHeight = pieceWidth / 2;
+		}
+		this.initialxPiece = initialx + (width - pieceWidth) / 2;
+		this.initialyPiece = initialy + (height - pieceHeight) / 2;
 
 		/* Calculate the size of one square. */
-		this.size = width / 4;
+		this.size = pieceWidth / 4;
 
 		/* The piece that will be displayed inside the box. */
 		this.piece = undefined;
@@ -14,10 +29,10 @@ class PieceBox extends ElementBox {
 	/* Updates the stored piece. */
 	updatePiece(piece) {
 		this.piece = new Piece(undefined);
-		for (let k = 0; k < piece.squares.length; k++) {
+		for (let square of piece.squares) {
 			/* Calculate positions relative to the center piece. */
-			let iRelative = piece.squares[k].i - piece.center.i;
-			let jRelative = piece.squares[k].j - piece.center.j;
+			let iRelative = square.i - piece.center.i;
+			let jRelative = square.j - piece.center.j;
 			this.piece.squares.push(new Square(iRelative, 2 + jRelative, true));
 		}
 		this.piece.center = this.piece.squares[0];
@@ -28,8 +43,8 @@ class PieceBox extends ElementBox {
 		super.display();
 
 		if (this.piece != undefined) {
-			for (let k = 0; k < this.piece.squares.length; k++) {
-				this.piece.squares[k].display(this.initialx, this.initialy, this.size);
+			for (let square of this.piece.squares) {
+				square.display(this.initialxPiece, this.initialyPiece, this.size);
 			}
 		}
 	}

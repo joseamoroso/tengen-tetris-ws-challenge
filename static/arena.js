@@ -23,20 +23,22 @@ class Arena extends ElementBox {
 		/* Store the list of possible Tetris pieces. */
 		this.possiblePieces = ['T', 'J', 'Z', 'O', 'S', 'L', 'I'];
 
-		/* Create a text message board at the top. */
-		this.messageBoard = new TextBox(initialx, initialy, width, height / 10, 'hello', true);
+		/* Create a text message box at the top. */
+		this.messageBox = new TextBox(initialx, initialy, width, height / 10, 'hello', true);
 
 		/* Create a grid on the left panel. */
 		let gridHeight = 9 * height / 10;
 		this.grid = new Grid(initialx, initialy + height / 10, gridHeight / 2, gridHeight);
 
-		/* Create the message boards on the right panel. */
+		/* Calculate the position and dimensions of the information panel. */
 		let initialxRightPanel = initialx + gridHeight / 2;
 		let initialyRightPanel = initialy + height / 10;
 		let heightRightPanel = 9 * height / 10;
 		let widthRightPanel = width - (heightRightPanel / 2);
-		let initialLevelBoardMessage = 'LEVEL: 0';
-		this.levelBox = new TextBox(initialxRightPanel, initialyRightPanel, widthRightPanel, heightRightPanel / 8, initialLevelBoardMessage, true);
+
+		/* Create the elements inside the information panel. */
+		let initialLevelBoxMessage = 'LEVEL: 0';
+		this.levelBox = new TextBox(initialxRightPanel, initialyRightPanel, widthRightPanel, heightRightPanel / 8, initialLevelBoxMessage, true);
 		let scoreLinesMessage = 'SCORE: 0\nLINES: 0';
 		this.scoreLinesBox = new TextBox(initialxRightPanel, initialyRightPanel + heightRightPanel / 8, widthRightPanel, heightRightPanel / 8, scoreLinesMessage, true);
 		this.nextPieceBox = new NextPieceBox(initialxRightPanel, initialyRightPanel + heightRightPanel / 4, widthRightPanel, heightRightPanel / 4);
@@ -46,8 +48,7 @@ class Arena extends ElementBox {
 		this.piece = undefined;
 		this.nextPiece = undefined;
 
-		/* Create a stopwatch to keep track of the timing of the animation
-    of the falling piece. */
+		/* Create a stopwatch to time the animation of the falling piece. */
 		this.stopwatch = new Stopwatch();
 
 		/* Variables for the logic of the game. */
@@ -101,7 +102,7 @@ class Arena extends ElementBox {
 			let result = this.grid.assignScoresAndClean();
 			this.score += result['score'];
 			this.lines += result['lines'];
-			this.updateScoreLinesBoard();
+			this.updateScoreLinesBox();
 
 			/* Check if the player has to change level. */
 			this.checkLevel();
@@ -111,17 +112,22 @@ class Arena extends ElementBox {
 			return false;
 		}
 
+		/* Restart the stopwatch for a new animation frame. */
 		this.stopwatch.start();
 		return true;
 	}
 
-	/* Replaces the current falling piece with a new one and starts the stopwatch. */
+	/* Returns a new piece created randomly from the list. */
 	createNewPiece() {
 		return new Piece(this.possiblePieces[Math.floor(Math.random() * this.possiblePieces.length)]);
 	}
 
-	/* Handles input from the keyboard. */
+	/* Handles keys pressed on the keyboard. */
 	keyPressed(code) {
+		if (this.lost) {
+			return;
+		}
+		
 		if (code == LEFT_ARROW) {
 			this.piece.move(DIR_LEFT, this.grid);
 		}
@@ -136,6 +142,7 @@ class Arena extends ElementBox {
 		}
 	}
 
+	/* Handles keys released from the keyboard. */
 	keyReleased(code) {
 		if (code == DOWN_ARROW) {
 			this.downKeyPressed = false;
@@ -154,20 +161,20 @@ class Arena extends ElementBox {
 		return false;
 	}
 
-	/* Checks if the player has cleared lines so as to change level. */
+	/* Checks if the player has cleared enough lines to level up. */
 	checkLevel() {
 		this.level = Math.floor(this.lines / 10);
-		this.updateLevelBoard();
+		this.updateLevelBox();
 	}
 
-	/* Updates the score and lines board with the new values. */
-	updateScoreLinesBoard() {
-		let message = 'SCORE: ' + this.score + '\nLINES: ' + this.lines;
-		this.scoreLinesBox.changeText(message);
+	/* Updates the score and lines box with the new values. */
+	updateScoreLinesBox() {
+		let text = 'SCORE: ' + this.score + '\nLINES: ' + this.lines;
+		this.scoreLinesBox.changeText(text);
 	}
 
-	/* Updates the level board after a change in level. */
-	updateLevelBoard() {
+	/* Updates the level box with the new level. */
+	updateLevelBox() {
 		this.levelBox.changeText('LEVEL: ' + this.level);
 	}
 
@@ -175,8 +182,8 @@ class Arena extends ElementBox {
 	display() {
 		super.display();
 
-		/* Display the top message board and the boards on the right panel. */
-		this.messageBoard.display();
+		/* Display the top message box and the boxes on the right panel. */
+		this.messageBox.display();
 		this.levelBox.display();
 		this.scoreLinesBox.display();
 		this.nextPieceBox.display();

@@ -7,10 +7,7 @@ class NextPieceBox extends ElementBox {
 		this.nextTextBox = new TextBox(initialx, initialy, width, height / 4, 'NEXT', false);
 
 		/* Create a new PieceBox for the next piece in the space remaining, at the bottom. */
-		let pieceBoxWidth = (80 / 100) * width;
-		let offsetx = (width - pieceBoxWidth) / 2;
-		let offsety = (3 * height / 4 - pieceBoxWidth / 2) / 2;
-		this.pieceBox = new PieceBox(initialx + offsetx, initialy + height / 4 + offsety, pieceBoxWidth);
+		this.pieceBox = new PieceBox(initialx, initialy + height / 4, width, 3 * height / 4);
 	}
 
 	/* Receives a new piece and updates the piece box inside. */
