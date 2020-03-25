@@ -1,9 +1,8 @@
 /* This is a little box where a piece can be represented. */
-class PieceBox {
+class PieceBox extends ElementBox {
 	constructor(initialx, initialy, width) {
-		/* Store some values. */
-		this.initialx = initialx;
-		this.initialy = initialy;
+		/* Call the superclass constructor. */
+		super(initialx, initialy, width, width / 2, false);
 
 		/* Calculate the size of one square. */
 		this.size = width / 4;
@@ -26,6 +25,8 @@ class PieceBox {
 
 	/* Display each of the squares in the stored piece. */
 	display() {
+		super.display();
+
 		if (this.piece != undefined) {
 			for (let k = 0; k < this.piece.squares.length; k++) {
 				this.piece.squares[k].display(this.initialx, this.initialy, this.size);

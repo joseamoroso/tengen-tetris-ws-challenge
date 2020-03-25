@@ -1,12 +1,9 @@
 /* This is the main grid for Tetris, 20x10, where the squares that fall to the floor
 are stored. */
-class Grid {
+class Grid extends ElementBox {
 	constructor(initialx, initialy, width, height) {
-		/* Store values for later use. */
-		this.initialx = initialx;
-		this.initialy = initialy;
-		this.width = width;
-		this.height = height;
+		/* Call the superclass constructor. */
+		super(initialx, initialy, width, height, true);
 
 		/* Calculate the size of one square in pixels. */
 		this.squareSize = this.width / 10;
@@ -138,12 +135,7 @@ class Grid {
 			}
 		}
 
-		/* Display a border around the grid. */
-		stroke(255);
-		strokeWeight(3);
-		line(this.initialx, this.initialy, this.initialx + this.width, this.initialy);
-		line(this.initialx + this.width, this.initialy, this.initialx + this.width, this.initialy + this.height);
-		line(this.initialx + this.width, this.initialy + this.height, this.initialx, this.initialy + this.height);
-		line(this.initialx, this.initialy + this.height, this.initialx, this.initialy);
+		/* Display the border around the grid. */
+		super.display();
 	}
 }

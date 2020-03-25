@@ -3,6 +3,7 @@ let DIR_DOWN = 'down'
 let DIR_RIGHT = 'right'
 let DIR_LEFT = 'left'
 
+/* Scoring system (at level zero) */
 let POINTS = {
 	1: 40,
 	2: 100,
@@ -10,19 +11,20 @@ let POINTS = {
 	4: 1200
 };
 
+let DEFAULT_TEXT_SIZE = 16;
+let DEFAULT_BORDER_STROKE_WEIGHT = 3;
+
 /* The arena handles all the information about one player. */
-class Arena {
+class Arena extends ElementBox {
 	constructor(initialx, initialy, width, height) {
-		this.initialx = initialx;
-		this.initialy = initialy;
-		this.width = width;
-		this.height = height;
+		/* Call the superclass constructor. */
+		super(initialx, initialy, width, height, true);
 
 		/* Store the list of possible Tetris pieces. */
 		this.possiblePieces = ['T', 'J', 'Z', 'O', 'S', 'L', 'I'];
 
 		/* Create a text message board at the top. */
-		this.messageBoard = new MessageBoard(initialx, initialy, width, height / 10, 'hello');
+		this.messageBoard = new TextBox(initialx, initialy, width, height / 10, 'hello', true);
 
 		/* Create a grid on the left panel. */
 		let gridHeight = 9 * height / 10;
@@ -34,11 +36,11 @@ class Arena {
 		let heightRightPanel = 9 * height / 10;
 		let widthRightPanel = width - (heightRightPanel / 2);
 		let initialLevelBoardMessage = 'LEVEL: 0';
-		this.levelBoard = new MessageBoard(initialxRightPanel, initialyRightPanel, widthRightPanel, heightRightPanel / 8, initialLevelBoardMessage);
+		this.levelBox = new TextBox(initialxRightPanel, initialyRightPanel, widthRightPanel, heightRightPanel / 8, initialLevelBoardMessage, true);
 		let scoreLinesMessage = 'SCORE: 0\nLINES: 0';
-		this.scoreLinesBoard = new MessageBoard(initialxRightPanel, initialyRightPanel + heightRightPanel / 8, widthRightPanel, heightRightPanel / 8, scoreLinesMessage);
-		this.nextPieceBoard = new NextPieceBoard(initialxRightPanel, initialyRightPanel + heightRightPanel / 4, widthRightPanel, heightRightPanel / 4);
-		this.statBoard = new StatBoard(initialxRightPanel, initialyRightPanel + heightRightPanel / 2, widthRightPanel, heightRightPanel / 2, this.possiblePieces);
+		this.scoreLinesBox = new TextBox(initialxRightPanel, initialyRightPanel + heightRightPanel / 8, widthRightPanel, heightRightPanel / 8, scoreLinesMessage, true);
+		this.nextPieceBox = new NextPieceBox(initialxRightPanel, initialyRightPanel + heightRightPanel / 4, widthRightPanel, heightRightPanel / 4);
+		this.statBox = new StatBox(initialxRightPanel, initialyRightPanel + heightRightPanel / 2, widthRightPanel, heightRightPanel / 2, this.possiblePieces);
 
 		/* Create the current piece and the next piece. */
 		this.piece = undefined;
@@ -66,8 +68,8 @@ class Arena {
 		/* Create pieces if not defined. */
 		if (this.nextPiece == undefined) {
 			this.nextPiece = this.createNewPiece();
-			this.nextPieceBoard.updatePiece(this.nextPiece);
-			this.statBoard.updateCounts(this.nextPiece.type);
+			this.nextPieceBox.updatePiece(this.nextPiece);
+			this.statBox.updateCounts(this.nextPiece.type);
 		}
 		if (this.piece == undefined) {
 			this.piece = new Piece(undefined);
@@ -161,29 +163,24 @@ class Arena {
 	/* Updates the score and lines board with the new values. */
 	updateScoreLinesBoard() {
 		let message = 'SCORE: ' + this.score + '\nLINES: ' + this.lines;
-		this.scoreLinesBoard.changeMessage(message);
+		this.scoreLinesBox.changeText(message);
 	}
 
 	/* Updates the level board after a change in level. */
 	updateLevelBoard() {
-		this.levelBoard.changeMessage('LEVEL: ' + this.level);
+		this.levelBox.changeText('LEVEL: ' + this.level);
 	}
 
 	/* Displays all the elements in the arena. */
 	display() {
-		/* Display a white border around the arena. */
-		stroke(255);
-		line(this.initialx, this.initialy, this.initialx + this.width, this.initialy);
-		line(this.initialx + this.width, this.initialy, this.initialx + this.width, this.initialy + this.height);
-		line(this.initialx + this.width, this.initialy + this.height, this.initialx, this.initialy + this.height);
-		line(this.initialx, this.initialy + this.height, this.initialx, this.initialy);
+		super.display();
 
 		/* Display the top message board and the boards on the right panel. */
 		this.messageBoard.display();
-		this.levelBoard.display();
-		this.scoreLinesBoard.display();
-		this.nextPieceBoard.display();
-		this.statBoard.display();
+		this.levelBox.display();
+		this.scoreLinesBox.display();
+		this.nextPieceBox.display();
+		this.statBox.display();
 
 		/* Display the falling piece. */
 		if (this.piece != undefined) {
