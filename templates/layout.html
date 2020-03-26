@@ -1,28 +1,11 @@
 <!DOCTYPE html>
-<head>
-    <!-- Load the p5.js library to create sketches -->
-    <script src="https://cdn.jsdelivr.net/npm/p5"></script>
-
-    <!-- Main script for the canvas -->
-    <script src="{{ url_for('static', filename='sketch.js') }}"></script>
-
-    <!-- Load the various JavaScript files for the client -->
-    <script src="{{ url_for('static', filename='client.js') }}"></script>
-    <script src="{{ url_for('static', filename='elementbox.js') }}"></script>
-    <script src="{{ url_for('static', filename='arena.js') }}"></script>
-		<script src="{{ url_for('static', filename='stopwatch.js') }}"></script>
-    <script src="{{ url_for('static', filename='grid.js') }}"></script>
-    <script src="{{ url_for('static', filename='square.js') }}"></script>
-    <script src="{{ url_for('static', filename='piece.js') }}"></script>
-    <script src="{{ url_for('static', filename='textbox.js') }}"></script>
-    <script src="{{ url_for('static', filename='nextpiecebox.js') }}"></script>
-    <script src="{{ url_for('static', filename='piecebox.js') }}"></script>
-    <script src="{{ url_for('static', filename='statbox.js') }}"></script>
-</head>
 <html>
+	<head>
+		<title>Tengen Tetris</title>
+		{% block scripts %} {% endblock %}
+	</head>
     <body>
-        <h1>
-            Tengen Tetris game
-        </h1>
+        <h1>Tengen Tetris</h1>
+				{% block body %} {% endblock %}
     </body>
 </html>
