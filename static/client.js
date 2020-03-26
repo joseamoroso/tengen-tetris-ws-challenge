@@ -17,35 +17,34 @@ class Client {
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
 		this.mode = mode;
+		console.log('Starting game in mode: ' + this.mode);
 
-		/* Create only one arena while in solo mode. */
+		/* Create only one arena in solo mode. */
 		if (this.mode == 'solo') {
-			/* Expand all the possible height. */
-			let arenaHeight = this.canvasHeight;
-			let arenaWidth = 2 * arenaHeight / 3;
-			this.arena = new Arena((this.canvasWidth - arenaWidth) / 2, 0, arenaWidth, arenaHeight);
+			this.arenas = [new Arena(0, 0, this.canvasWidth, this.canvasHeight)];
 		}
 		else if (this.mode == 'duo') {
-			/* TODO: create two arenas side by side. */
+			this.arenas = [];
+			this.arenas.push(new Arena(0, 0, this.canvasWidth / 2, this.canvasHeight));
 		}
 	}
 
 	/* Gets called when a key is pressed. */
 	keyPressed(code) {
-		this.arena.keyPressed(code);
+		this.arenas[0].keyPressed(code);
 	}
 
 	/* Gets called when a key is released. */
 	keyReleased(code) {
-		this.arena.keyReleased(code);
+		this.arenas[0].keyReleased(code);
 	}
 
 	/* Updates all the elements inside the arena. */
 	update() {
-		this.arena.update();
+		this.arenas[0].update();
 	}
 
 	display() {
-		this.arena.display();
+		this.arenas[0].display();
 	}
 }
