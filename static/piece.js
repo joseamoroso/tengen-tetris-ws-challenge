@@ -7,7 +7,6 @@ class Piece {
 
 		/* If type is undefined, just create an empty piece. */
 		if (type == undefined) {
-			console.log('Creating an uninitialized piece.');
 			return;
 		}
 

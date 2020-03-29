@@ -1,20 +1,17 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, url_for
+from flask_socketio import SocketIO, emit
+
+from master import Master
 
 # Initialize the flask app.
 app = Flask(__name__)
+socketio = SocketIO(app)
+master = Master()
 
+# Serve the index page.
 @app.route('/', methods=['GET'])
 def index():
 	return render_template('index.html')
-
-# Choose the game mode based on the value of the button pressed.
-@app.route('/game', methods=['POST'])
-def game():
-	mode = request.form['mode']
-	if mode == 'solo':
-		return redirect(url_for('solo'))
-	elif mode == 'duo':
-		return redirect(url_for('duo'))
 
 # Serve the game in solo mode.
 @app.route('/solo', methods=['GET'])
@@ -26,6 +23,11 @@ def solo():
 def duo():
 	return render_template('duo.html')
 
+# Handle socket io communications.
+@socketio.on('requestDuoGame')
+def requestDuoGame(data):
+	return master.requestDuoGame(request.sid)
+
 if __name__ == '__main__':
 	app.debug = True
-	app.run(host='0.0.0.0', port=8080)
+	socketio.run(app, host='0.0.0.0', port=8080)

@@ -18,9 +18,6 @@ class Square {
 		else if (direction == DIR_LEFT) {
 			this.j -= 1;
 		}
-		else {
-			console.log('Cannot move in the required direction. Direction unexpected.');
-		}
 	}
 
 	/* Receives a movement and a grid and decides if the movement is allowed. */
@@ -39,7 +36,6 @@ class Square {
 			nextj = this.j + 1;
 		}
 		else {
-			console.log('Unexpected direction.');
 			return false;
 		}
 

@@ -1,50 +1,66 @@
-
-/*document.addEventListener('DOMContentLoaded', () => {
-    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
-
-    socket.on('connect', () => {
-	console.log('Socket connected correctly');
-	socket.emit('waitingToPlay', {'id': socket.id});
-    });
-
-    socket.on('ack', () => {
-	console.log('server has acknowlodged me');
-    })
-});*/
-
 class Client {
 	constructor(canvasWidth, canvasHeight, mode) {
+		console.log('Creating client object in mode: ' + this.mode);
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
 		this.mode = mode;
-		console.log('Starting game in mode: ' + this.mode);
 
-		/* Create only one arena in solo mode. */
+		/* Create an active arena and optionally an adversary arena. */
+		this.activeArena = undefined;
+		this.adversaryArena = undefined;
+	}
+
+	initializeActiveArena() {
 		if (this.mode == 'solo') {
-			this.arenas = [new Arena(0, 0, this.canvasWidth, this.canvasHeight)];
+			this.activeArena = new Arena(0, 0, this.canvasWidth, this.canvasHeight);
 		}
 		else if (this.mode == 'duo') {
-			this.arenas = [];
-			this.arenas.push(new Arena(0, 0, this.canvasWidth / 2, this.canvasHeight));
+			this.activeArena = new Arena(0, 0, this.canvasWidth / 2, this.canvasHeight);
 		}
+	}
+
+	initializeAdversaryArena() {
+		this.adversaryArena = new Arena(this.canvasWidth / 2, 0, this.canvasWidth / 2, this.canvasHeight);
+	}
+
+	beginDuoGame() {
+		/* Make both arenas undefined. */
+		this.activeArena = undefined;
+		this.adversaryArena = undefined;
 	}
 
 	/* Gets called when a key is pressed. */
 	keyPressed(code) {
-		this.arenas[0].keyPressed(code);
+		if (this.activeArena != undefined) {
+			this.activeArena.keyPressed(code);
+		}
 	}
 
 	/* Gets called when a key is released. */
 	keyReleased(code) {
-		this.arenas[0].keyReleased(code);
+		if (this.activeArena != undefined) {
+			this.activeArena.keyReleased(code);
+		}
 	}
 
-	/* Updates all the elements inside the arena. */
+	/* Main loop that updates the arenas. */
 	update() {
-		this.arenas[0].update();
+		if (this.activeArena == undefined) {
+			this.initializeActiveArena();
+		}
+		if (this.adversaryArena == undefined && this.mode == 'duo') {
+			this.initializeAdversaryArena();
+		}
+
+		this.activeArena.update();
 	}
 
 	display() {
-		this.arenas[0].display();
+		if (this.activeArena != undefined) {
+			this.activeArena.display();
+		}
+		if (this.adversaryArena != undefined) {
+			this.adversaryArena.display();
+		}
 	}
 }

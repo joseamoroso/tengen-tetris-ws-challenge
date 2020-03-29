@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 
 {% block scripts %}
+	<!-- Load the socket io library -->
+	<script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script>
+
 	<!-- Load the p5.js library to create sketches -->
 	<script src="https://cdn.jsdelivr.net/npm/p5"></script>
 
@@ -22,5 +25,6 @@
 {% endblock %}
 
 {% block body %}
+{% block duocontent %}{% endblock %}
 	<div id="sketch-holder"></div>
 {% endblock %}
