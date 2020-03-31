@@ -25,6 +25,31 @@ class StatBox extends ElementBox {
 		this.countTextBoxes[label].changeText(this.countNumbers[label]);
 	}
 
+	/* Returns an object with info about this stat box for the server. */
+	packServerUpdate() {
+		let pack = {};
+		for (let piece of this.pieces) {
+			pack[piece] = this.countNumbers[piece];
+		}
+
+		return pack;
+	}
+
+	/* Receives a JSON object from the server with new info about this stat box. */
+	receiveServerUpdate(data) {
+		for (let piece of this.pieces) {
+			this.countNumbers[piece] = data[piece];
+		}
+		this.updateAllTextBoxes();
+	}
+
+	/* When all the counts have been updated, call this function to update the text boxes. */
+	updateAllTextBoxes() {
+		for (let piece of this.pieces) {
+			this.countTextBoxes[piece].changeText(this.countNumbers[piece]);
+		}
+	}
+
 	display() {
 		super.display();
 

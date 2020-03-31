@@ -23,11 +23,28 @@ def solo():
 def duo():
 	return render_template('duo.html')
 
-# Handle socket io communications.
+
+# A client requests to play in duo mode.
 @socketio.on('requestDuoGame')
 def requestDuoGame(data):
 	return master.requestDuoGame(request.sid)
 
+# A client sends an update of its own arena.
+@socketio.on('updateArena')
+def updateArena(data):
+	return master.updateArena(request.sid, data)
+
+# A client disconnects.
+@socketio.on('disconnect')
+def disconnect(data):
+	return master.disconnect(request.sid)
+
+# A client requests the next piece (only in duo mode).
+@socketio.on('requestNextPiece')
+def requestNextPiece(data):
+	return master.requestNextPiece(request.sid)
+
+# Run the app with the use of websockets.
 if __name__ == '__main__':
 	app.debug = True
 	socketio.run(app, host='0.0.0.0', port=8080)

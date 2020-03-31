@@ -57,21 +57,37 @@ class Arena extends ElementBox {
 		this.lost = false;
 		this.score = 0;
 		this.lines = 0;
+
+		/* Variables for communication only happening once. */
+		this.nextPieceRequested = false;
 	}
 
 	/* Update all the elements inside the arena. This function
 	gets called in a loop. */
-	update() {
+	update(mode) {
 		if (this.lost) {
 			return;
 		}
 
-		/* Create pieces if not defined. */
+		/* When the next piece is undefined. */
 		if (this.nextPiece == undefined) {
-			this.nextPiece = this.createNewPiece();
-			this.nextPieceBox.updatePiece(this.nextPiece);
-			this.statBox.updateCounts(this.nextPiece.type);
+			/* In solo mode, the next piece is created randomly inside the browser. */
+			if (mode == 'solo') {
+				this.nextPiece = this.createNewPiece();
+				this.nextPieceBox.updatePiece(this.nextPiece);
+				this.statBox.updateCounts(this.nextPiece.type);
+			}
+			/* In duo mode, a request has to be sent to the server. */
+			else if (mode == 'duo') {
+				if (!this.nextPieceRequested) {
+					client.sendMessage('updateArena', this.packServerUpdate());
+					client.sendMessage('requestNextPiece', {});
+					this.nextPieceRequested = true;
+				}
+			}
 		}
+
+		/* When the piece is not defined, grab it from the next piece. */
 		if (this.piece == undefined) {
 			this.piece = new Piece(undefined);
 			this.piece.getValuesFrom(this.nextPiece);
@@ -92,6 +108,9 @@ class Arena extends ElementBox {
 
 	/* Logic for the piece moving down. */
 	movePieceDown() {
+		/* TODO: at this point, this piece always exists and is about to change
+		position, so send the position to the server. */
+
 		/* If the piece is not able to move down, replace the current piece. */
 		if (!this.piece.move(DIR_DOWN, this.grid)) {
 			/* The piece was not able to move down, so drop it in the grid. */
@@ -127,7 +146,7 @@ class Arena extends ElementBox {
 		if (this.lost) {
 			return;
 		}
-		
+
 		if (code == LEFT_ARROW) {
 			this.piece.move(DIR_LEFT, this.grid);
 		}
@@ -176,6 +195,50 @@ class Arena extends ElementBox {
 	/* Updates the level box with the new level. */
 	updateLevelBox() {
 		this.levelBox.changeText('LEVEL: ' + this.level);
+	}
+
+	/* This arena receives the first piece and the first next piece (duo mode). */
+	receiveFirstPieces(data) {
+		this.nextPiece = new Piece(data['nextPiece']);
+		this.nextPieceBox.updatePiece(this.nextPiece);
+		this.statBox.updateCounts(this.nextPiece.type);
+		this.piece = new Piece(data['piece']);
+		this.stopwatch.start();
+	}
+
+	/* Packs the arena's information to be sent to the server. */
+	packServerUpdate() {
+		return {
+			'level': this.level,
+			'score': this.score,
+			'lines': this.lines,
+			'grid': this.grid.packServerUpdate(),
+			'stats': this.statBox.packServerUpdate(),
+		}
+	}
+
+	/* The server has sent an update on the adversary's arena. */
+	receiveServerUpdate(data) {
+		/* Keep a copy of the numerical values. */
+		this.level = data['level'];
+		this.score = data['score'];
+		this.lines = data['lines'];
+
+		/* Upate the text boxes. */
+		this.updateLevelBox();
+		this.updateScoreLinesBox();
+
+		/* Update the grid and the statistics. */
+		this.grid.receiveServerUpdate(data['grid']);
+		this.statBox.receiveServerUpdate(data['stats']);
+	}
+
+	/* The server has sent this arena the next piece. */
+	getNextPiece(data) {
+		this.nextPiece = new Piece(data['piece']);
+		this.nextPieceBox.updatePiece(this.nextPiece);
+		this.statBox.updateCounts(this.nextPiece.type);
+		this.nextPieceRequested = false;
 	}
 
 	/* Displays all the elements in the arena. */

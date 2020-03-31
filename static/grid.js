@@ -126,6 +126,28 @@ class Grid extends ElementBox {
 		};
 	}
 
+	/* Packs the info about this grid for the server. */
+	packServerUpdate() {
+		let pack = [];
+		for (let i = 0; i < 20; i++) {
+			pack.push([]);
+			for (let j = 0; j < 10; j++) {
+				pack[i].push({'visible': this.squares[i][j].visible});
+			}
+		}
+
+		return pack;
+	}
+
+	/* The server has sent an update on this grid. */
+	receiveServerUpdate(data) {
+		for (let i = 0; i < 20; i++) {
+			for (let j = 0; j < 10; j++) {
+				this.squares[i][j].visible = data[i][j].visible;
+			}
+		}
+	}
+
 	/* Displays the contents of the grid. */
 	display () {
 		/* Display each of the squares */
