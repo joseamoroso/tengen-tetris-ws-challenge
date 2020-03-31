@@ -44,6 +44,9 @@ class Master:
 			self.players[2] = socketId
 			print('Client ' + socketId + ' is assigned player 2')
 			self.beginDuoGame()
+		else:
+			print('The room is currently full')
+			emit('roomCurrentlyFull', {}, room=socketId)
 
 	# Create the first two pieces and send a message to begin the game.
 	def beginDuoGame(self):
