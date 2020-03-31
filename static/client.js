@@ -32,6 +32,13 @@ class Client {
 		this.playingDuo = true;
 	}
 
+	/* The server tells the client to end the duo game. */
+	endDuoGame() {
+		this.activeArena = undefined;
+		this.adversaryArena = undefined;
+		this.playingDuo = false;
+	}
+
 	/* The server has sent the update on the adversary's arena. */
 	getAdversaryArenaUpdate(data) {
 		this.adversaryArena.receiveServerUpdate(data);

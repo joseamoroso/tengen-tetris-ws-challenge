@@ -54,6 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		console.log('Received message: piece position from server');
 		client.piecePositionFromServer(data);
 	});
+
+	/* The server indicates that the game must be stopped. */
+	socket.on('endDuoGame', data => {
+		console.log('Received message: end duo game');
+		client.endDuoGame();
+		window.location.replace(location.protocol + '//' + document.domain + ':' + location.port + '/duo');
+	});
 });
 
 function setup() {
