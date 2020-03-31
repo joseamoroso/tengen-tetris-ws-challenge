@@ -60,6 +60,7 @@ class Arena extends ElementBox {
 
 		/* Variables for communication only happening once. */
 		this.nextPieceRequested = false;
+		this.sendNewPiecePosition = false;
 	}
 
 	/* Update all the elements inside the arena. This function
@@ -95,22 +96,27 @@ class Arena extends ElementBox {
 			this.stopwatch.start();
 		}
 
+		/* Check if I have to send the piece position to the server. */
+		if (mode == 'duo' && this.sendNewPiecePosition) {
+			client.sendMessage('piecePositionToServer', this.packPiecePosition());
+			this.sendNewPiecePosition = false;
+		}
+
 		/* If the down key is pressed, directly try to move the piece. */
 		if (this.downKeyPressed) {
 			if (this.stopwatch.getElapsedTime() > 25) {
 				this.movePieceDown();
+				this.sendNewPiecePosition = true;
 			}
 		}
 		else if (this.stopwatch.getElapsedTime() > 400) {
 			this.movePieceDown();
+			this.sendNewPiecePosition = true;
 		}
 	}
 
 	/* Logic for the piece moving down. */
 	movePieceDown() {
-		/* TODO: at this point, this piece always exists and is about to change
-		position, so send the position to the server. */
-
 		/* If the piece is not able to move down, replace the current piece. */
 		if (!this.piece.move(DIR_DOWN, this.grid)) {
 			/* The piece was not able to move down, so drop it in the grid. */
@@ -148,13 +154,19 @@ class Arena extends ElementBox {
 		}
 
 		if (code == LEFT_ARROW) {
-			this.piece.move(DIR_LEFT, this.grid);
+			if (this.piece.move(DIR_LEFT, this.grid)) {
+				this.sendNewPiecePosition = true;
+			}
 		}
 		else if (code == RIGHT_ARROW) {
-			this.piece.move(DIR_RIGHT, this.grid);
+			if (this.piece.move(DIR_RIGHT, this.grid)) {
+				this.sendNewPiecePosition = true;
+			}
 		}
 		else if (code == UP_ARROW) {
-			this.piece.rotate(this.grid);
+			if (this.piece.rotate(this.grid)) {
+				this.sendNewPiecePosition = true;
+			}
 		}
 		else if (code == DOWN_ARROW) {
 			this.downKeyPressed = true;
@@ -217,6 +229,16 @@ class Arena extends ElementBox {
 		}
 	}
 
+	/* Packs the falling piece's position for the server. */
+	packPiecePosition() {
+		return this.piece.packServerUpdate();
+	}
+
+	/* Receives a piece update from the server. */
+	receivePiecePosition(data) {
+		this.piece.receiveServerUpdate(data);
+	}
+
 	/* The server has sent an update on the adversary's arena. */
 	receiveServerUpdate(data) {
 		/* Keep a copy of the numerical values. */
@@ -234,7 +256,7 @@ class Arena extends ElementBox {
 	}
 
 	/* The server has sent this arena the next piece. */
-	getNextPiece(data) {
+	receiveNextPiece(data) {
 		this.nextPiece = new Piece(data['piece']);
 		this.nextPieceBox.updatePiece(this.nextPiece);
 		this.statBox.updateCounts(this.nextPiece.type);

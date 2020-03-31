@@ -36,13 +36,18 @@ def updateArena(data):
 
 # A client disconnects.
 @socketio.on('disconnect')
-def disconnect(data):
+def disconnect():
 	return master.disconnect(request.sid)
 
 # A client requests the next piece (only in duo mode).
 @socketio.on('requestNextPiece')
 def requestNextPiece(data):
 	return master.requestNextPiece(request.sid)
+
+# A client sends its new piece position.
+@socketio.on('piecePositionToServer')
+def piecePositionToServer(data):
+	return master.piecePositionToServer(request.sid, data)
 
 # Run the app with the use of websockets.
 if __name__ == '__main__':

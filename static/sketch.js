@@ -40,7 +40,19 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* The server sends the client the next piece it requested. */
 	socket.on('nextPiece', data => {
 		console.log('Received message: next piece');
-		client.getNextPiece(data);
+		client.receiveNextPiece(data);
+	});
+
+	/* The server sends the client the adversary's next piece. */
+	socket.on('adversaryNextPiece', data => {
+		console.log('Received message: adversary next piece');
+		client.receiveAdversaryNextPiece(data);
+	});
+
+	/* The server sends the new position of the adversary piece. */
+	socket.on('piecePositionFromServer', data => {
+		console.log('Received message: piece position from server');
+		client.piecePositionFromServer(data);
 	});
 });
 

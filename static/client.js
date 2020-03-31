@@ -38,8 +38,18 @@ class Client {
 	}
 
 	/* The server has sent the next piece for the active arena in duo mode. */
-	getNextPiece(data) {
-		this.activeArena.getNextPiece(data);
+	receiveNextPiece(data) {
+		this.activeArena.receiveNextPiece(data);
+	}
+
+	/* The server has sent the adversary's next piece. */
+	receiveAdversaryNextPiece(data) {
+		this.adversaryArena.receiveNextPiece(data);
+	}
+
+	/* The server has sent the new position of the adversary piece. */
+	piecePositionFromServer(data) {
+		this.adversaryArena.receivePiecePosition(data);
 	}
 
 	/* Gets called when a key is pressed. */

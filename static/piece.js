@@ -90,6 +90,8 @@ class Piece {
 
 		/* All the squares occupy valid positions, so copy the rotated piece into this one. */
 		this.getValuesFrom(rotatedPiece);
+
+		return true;
 	}
 
 	/* Returns a new piece with the squares of this one rotated. */
@@ -108,8 +110,28 @@ class Piece {
 	/* Copies the values from the piece given as an argument. */
 	getValuesFrom(piece) {
 		this.squares = [];
-		for (let k = 0; k < piece.squares.length; k++) {
-			this.squares.push(new Square(piece.squares[k].i, piece.squares[k].j, true));
+		for (let square of piece.squares) {
+			this.squares.push(new Square(square.i, square.j, true));
+		}
+		this.center = this.squares[0];
+	}
+
+	/* Packs the information about the piece for the server. */
+	packServerUpdate() {
+		let pack = {};
+		pack['squares'] = [];
+		for (let square of this.squares) {
+			pack['squares'].push({'i': square.i, 'j': square.j});
+		}
+
+		return pack;
+	}
+
+	/* Receives the piece updated from the server (this is the adversary's piece). */
+	receiveServerUpdate(data) {
+		this.squares = [];
+		for (let square of data['squares']) {
+			this.squares.push(new Square(square.i, square.j, true));
 		}
 		this.center = this.squares[0];
 	}

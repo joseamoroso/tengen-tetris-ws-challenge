@@ -95,12 +95,12 @@ class Master:
 
 		# Update the corresponding arena.
 		self.arenas[player].update(data)
-		print('Updated the arena of player ' + player)
+		print('Updated the arena of player ' + str(player))
 
 		# Update the other player's adversary arena.
-		adversary = 2 if player == 1 else 1
+		adversary = self.getAdversaryPlayerNumber(player)
 		emit('adversaryArenaUpdate', data, room=self.getSocketId(adversary))
-		print('Sent an arena update to adversary player ' + adversary)
+		print('Sent an arena update to adversary player ' + str(adversary))
 
 	# Called when a socket id disconnects. Remove this socket id from the player list.
 	def disconnect(self, socketId):
@@ -119,6 +119,9 @@ class Master:
 		self.arenas[1] = Arena(1, pieces)
 		self.arenas[2] = Arena(2, pieces)
 
+	def getAdversaryPlayerNumber(self, playerNumber):
+		return 1 if playerNumber == 2 else 2
+
 	# A client requests the next piece.
 	def requestNextPiece(self, socketId):
 		# Check that the socket id is a player.
@@ -129,20 +132,39 @@ class Master:
 
 		print('Player ' + str(player) + ' is requesting the next piece')
 
-		# If master already has a piece prepared, send that one and update the counter.
+		# If master already has a piece prepared, grab that one.
+		nextPiece = None
 		if self.piecePosition[player] < len(self.pieceList):
 			nextPiece = self.pieceList[self.piecePosition[player]]
-			emit('nextPiece', {'piece': nextPiece}, room=socketId)
-			print('Sent next piece ' + nextPiece + ' to player ' + str(player))
-			self.piecePosition[player] += 1
-
-		# If not, append a random piece at the end of master's list first, then send that piece.
+		# If not, append a random piece at the end of master's list.
 		else:
-			randomPiece = pieces[floor(random() * len(pieces))]
-			self.pieceList.append(randomPiece)
-			emit('nextPiece', {'piece': randomPiece}, room=socketId)
-			print('Sent next piece ' + randomPiece + ' to player ' + str(player))
-			self.piecePosition[player] += 1
+			nextPiece = pieces[floor(random() * len(pieces))]
+			self.pieceList.append(nextPiece)
 
-		print('Current piece list state:')
-		print(pieceList)
+		# Update the counter of the current player.
+		self.piecePosition[player] += 1
+
+		# Send the next piece to the client that requested it.
+		emit('nextPiece', {'piece': nextPiece}, room=socketId)
+		print('Sent next piece ' + nextPiece + ' to player ' + str(player))
+
+		# Send this next piece to the other client.
+		adversary = self.getAdversaryPlayerNumber(player)
+		emit('adversaryNextPiece', {'piece': nextPiece}, room=self.getSocketId(adversary))
+		print('Sent adversary next piece ' + nextPiece + ' to player ' + str(player))
+
+	# A client is sending the new position of its falling piece.
+	def piecePositionToServer(self, socketId, data):
+		# Check this socket id is a player.
+		player = self.getPlayerNumber(socketId)
+		if player == None:
+			print('ERROR: cannot receive a piece update from a client that is not a player')
+			return
+
+		# Update the piece of the player that has sent the request.
+		self.arenas[player].updatePieceFromClient(data)
+
+		# Send an update to the other player.
+		adversary = self.getAdversaryPlayerNumber(player)
+		emit('piecePositionFromServer', data, room=self.getSocketId(adversary))
+		print('Sent new position of adversary piece to player ' + str(adversary))
