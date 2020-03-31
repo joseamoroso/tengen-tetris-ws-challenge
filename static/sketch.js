@@ -4,11 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* Connect this client to the server through web sockets. */
 	socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
-	/* When the socket is connected, establish the communication interface here. */
+	/* When the socket is connected, establish the request duo game button. */
 	socket.on('connect', () => {
 		console.log('Client connected to the server through web sockets');
 
-		let button = document.querySelector('#requestButton');
+		let button = document.querySelector('#request-button');
 		if (typeof(button) != 'undefined' && button != null) {
 			button.onclick = () => {
 				console.log('Requesting duo game to the server');
@@ -21,13 +21,14 @@ document.addEventListener('DOMContentLoaded', () => {
 	a waiting text. */
 	socket.on('waitingForAnotherPlayer', data => {
 		console.log('Received message: waiting for a nother player');
-		document.querySelector('#duoContent').innerHTML = '<p>Please wait while we find you another player...</p>';
+		document.querySelector('#duo-content').innerHTML = '<p>Please wait while we find you another player...</p>';
 	});
 
 	/* The server tells us everything is ready to start duo game. Remove everything except the canvas. */
 	socket.on('beginDuoGame', data => {
 		console.log('Received message: begin duo game');
-		document.querySelector('#duoContent').innerHTML = '';
+		document.querySelector('#duo-content').innerHTML = '';
+		document.querySelector('#canvas-holder').style.display = 'block';
 		client.beginDuoGame(data);
 	});
 
@@ -73,7 +74,7 @@ function setup() {
 	let canvas = createCanvas(canvasWidth, 600);
 
 	/* Move the canvas to the appropriate div element. */
-	canvas.parent('sketch-holder');
+	canvas.parent('canvas-holder');
 
 	/* Create the client. */
 	client = new Client(canvasWidth, 600, mode=mode);

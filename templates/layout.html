@@ -2,10 +2,16 @@
 <html>
 	<head>
 		<title>Tengen Tetris</title>
+		<script src="{{ url_for('static', filename='main_layout.js') }}"></script>
 		{% block scripts %} {% endblock %}
 	</head>
     <body>
         <h1>Tengen Tetris</h1>
+				<div id="navbar">
+					<button id="home-button">Home</button>
+					<button id="solo-button">Solo</button>
+					<button id="duo-button">Duo</button>
+				</div>
 				{% block body %} {% endblock %}
     </body>
 </html>

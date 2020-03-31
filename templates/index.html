@@ -1,10 +1,1 @@
 {% extends "layout.html" %}
-
-{% block body %}
-	<form action="{{ url_for('solo') }}" method="get">
-		<button type="submit">Play solo mode</button>
-	</form>
-	<form action="{{ url_for('duo') }}" method="get">
-		<button type="submit">Play duo mode</button>
-	</form>
-{% endblock %}
