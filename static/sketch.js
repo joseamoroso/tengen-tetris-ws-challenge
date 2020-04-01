@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* The server sends the client an update on the adversary's arena. */
 	socket.on('adversaryArenaUpdate', data => {
 		console.log('Received message: get adversary arena update');
-		client.getAdversaryArenaUpdate(data);
+		client.receiveAdversaryArenaUpdate(data);
 	});
 
 	/* The server sends the client the next piece it requested. */
@@ -57,9 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	/* The server sends the new position of the adversary piece. */
-	socket.on('piecePositionFromServer', data => {
-		console.log('Received message: piece position from server');
-		client.piecePositionFromServer(data);
+	socket.on('adversaryPiece', data => {
+		console.log('Received message: adversary piece');
+		client.receiveAdversaryPiece(data);
 	});
 
 	/* The server indicates that the game must be stopped. */
@@ -67,6 +67,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		console.log('Received message: end duo game');
 		client.endDuoGame();
 		window.location.replace(location.protocol + '//' + document.domain + ':' + location.port + '/duo');
+	});
+
+	/* The server has sent a pause event in duo mode. */
+	socket.on('pause', data => {
+		console.log('Received message: pause');
+		client.togglePause();
+	});
+
+	/* The other player has decided to start over. */
+	socket.on('startedAgain', data => {
+		console.log('Received message: started again');
+		client.startedAgain();
 	});
 });
 
@@ -94,7 +106,7 @@ function draw() {
 }
 
 function keyPressed() {
-	client.keyPressed(keyCode);
+	client.keyPressed(keyCode, key);
 	return false;
 }
 

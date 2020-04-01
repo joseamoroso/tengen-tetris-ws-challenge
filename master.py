@@ -157,7 +157,7 @@ class Master:
 		print('Sent adversary next piece ' + nextPiece + ' to player ' + str(player))
 
 	# A client is sending the new position of its falling piece.
-	def piecePositionToServer(self, socketId, data):
+	def receivePiece(self, socketId, data):
 		# Check this socket id is a player.
 		player = self.getPlayerNumber(socketId)
 		if player == None:
@@ -169,5 +169,38 @@ class Master:
 
 		# Send an update to the other player.
 		adversary = self.getAdversaryPlayerNumber(player)
-		emit('piecePositionFromServer', data, room=self.getSocketId(adversary))
+		emit('adversaryPiece', data, room=self.getSocketId(adversary))
 		print('Sent new position of adversary piece to player ' + str(adversary))
+
+	# A player wants to toggle the paused state.
+	def pause(self, socketId):
+		# Check the socket id corresponds to a player.
+		player = self.getPlayerNumber(socketId)
+		if player == None:
+			print('ERROR: cannot handle pause message from client that is not a player')
+			return
+
+		print('Received pause event from player ' + str(player))
+
+		# Send this pause event back to the other player.
+		adversary = self.getAdversaryPlayerNumber(player)
+		emit('pause', {}, room=self.getSocketId(adversary))
+		print('Sent pause event to player ' + str(adversary))
+
+	# A player in duo mode has decided to start over.
+	def startedAgain(self, socketId):
+		# Check the socket id corresponds to a player.
+		player = self.getPlayerNumber(socketId)
+		if player == None:
+			print('ERROR: cannot handle startedAgain message from client that is not a player')
+			return
+
+		print('Received started again event from player ' + str(player))
+
+		# Reset the piece position for this player.
+		self.piecePosition[player] = 2
+
+		# Send this pause event back to the other player.
+		adversary = self.getAdversaryPlayerNumber(player)
+		emit('startedAgain', {}, room=self.getSocketId(adversary))
+		print('Sent started again event to player ' + str(adversary))

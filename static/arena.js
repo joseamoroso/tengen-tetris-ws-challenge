@@ -54,7 +54,6 @@ class Arena extends ElementBox {
 		/* Variables for the logic of the game. */
 		this.level = 0;
 		this.downKeyPressed = false;
-		this.lost = false;
 		this.score = 0;
 		this.lines = 0;
 
@@ -66,10 +65,6 @@ class Arena extends ElementBox {
 	/* Update all the elements inside the arena. This function
 	gets called in a loop. */
 	update(mode) {
-		if (this.lost) {
-			return;
-		}
-
 		/* When the next piece is undefined. */
 		if (this.nextPiece == undefined) {
 			/* In solo mode, the next piece is created randomly inside the browser. */
@@ -90,15 +85,17 @@ class Arena extends ElementBox {
 
 		/* When the piece is not defined, grab it from the next piece. */
 		if (this.piece == undefined) {
-			this.piece = new Piece(undefined);
-			this.piece.getValuesFrom(this.nextPiece);
-			this.nextPiece = undefined;
-			this.stopwatch.start();
+			if (this.nextPiece != undefined) {
+				this.piece = new Piece(undefined);
+				this.piece.getValuesFrom(this.nextPiece);
+				this.nextPiece = undefined;
+				this.stopwatch.start();
+			}
 		}
 
 		/* Check if I have to send the piece position to the server. */
 		if (mode == 'duo' && this.sendNewPiecePosition) {
-			client.sendMessage('piecePositionToServer', this.packPiecePosition());
+			client.sendMessage('piece', this.packPiece());
 			this.sendNewPiecePosition = false;
 		}
 
@@ -149,10 +146,6 @@ class Arena extends ElementBox {
 
 	/* Handles keys pressed on the keyboard. */
 	keyPressed(code) {
-		if (this.lost) {
-			return;
-		}
-
 		if (code == LEFT_ARROW) {
 			if (this.piece.move(DIR_LEFT, this.grid)) {
 				this.sendNewPiecePosition = true;
@@ -180,16 +173,13 @@ class Arena extends ElementBox {
 		}
 	}
 
-	/* Checks if this player has lost. */
+	/* Checks if the player has lost and notifies the client. */
 	checkLose() {
 		for (let j = 0; j < 10; j++) {
 			if (this.grid.squares[0][j].visible) {
-				this.lost = true;
-				return true;
+				client.playerHasLost();
 			}
 		}
-
-		return false;
 	}
 
 	/* Checks if the player has cleared enough lines to level up. */
@@ -229,16 +219,6 @@ class Arena extends ElementBox {
 		}
 	}
 
-	/* Packs the falling piece's position for the server. */
-	packPiecePosition() {
-		return this.piece.packServerUpdate();
-	}
-
-	/* Receives a piece update from the server. */
-	receivePiecePosition(data) {
-		this.piece.receiveServerUpdate(data);
-	}
-
 	/* The server has sent an update on the adversary's arena. */
 	receiveServerUpdate(data) {
 		/* Keep a copy of the numerical values. */
@@ -253,6 +233,16 @@ class Arena extends ElementBox {
 		/* Update the grid and the statistics. */
 		this.grid.receiveServerUpdate(data['grid']);
 		this.statBox.receiveServerUpdate(data['stats']);
+	}
+
+	/* Packs the falling piece for the server. */
+	packPiece() {
+		return this.piece.packServerUpdate();
+	}
+
+	/* Receives a piece update from the server. */
+	receivePiece(data) {
+		this.piece.receiveServerUpdate(data);
 	}
 
 	/* The server has sent this arena the next piece. */

@@ -45,11 +45,21 @@ def requestNextPiece(data):
 	return master.requestNextPiece(request.sid)
 
 # A client sends its new piece position.
-@socketio.on('piecePositionToServer')
-def piecePositionToServer(data):
-	return master.piecePositionToServer(request.sid, data)
+@socketio.on('piece')
+def receivePiece(data):
+	return master.receivePiece(request.sid, data)
 
-# Run the app with the use of websockets.
+# A player in duo mode wants to toggle the paused state.
+@socketio.on('pause')
+def pause(data):
+	return master.pause(request.sid)
+
+# A player in duo mode has decided to start over.
+@socketio.on('startedAgain')
+def startedAgain(data):
+	return master.startedAgain(request.sid)
+
+# Run the app with web sockets capabilities.
 if __name__ == '__main__':
 	app.debug = True
 	socketio.run(app, host='0.0.0.0', port=8080)

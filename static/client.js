@@ -1,3 +1,4 @@
+/* This class controls the highest level logic of the game. */
 class Client {
 	constructor(canvasWidth, canvasHeight, mode) {
 		console.log('Creating client object in mode: ' + mode);
@@ -5,11 +6,20 @@ class Client {
 		this.canvasHeight = canvasHeight;
 		this.mode = mode;
 
-		/* Create an active arena and optionally an adversary arena. */
+		/* Create an active arena for the player and adn adversary's arena. */
 		this.activeArena = undefined;
 		this.adversaryArena = undefined;
+
+		/* High level control of the game. */
+		this.paused = true;
+		this.lost = false;
+
+		/* Some variables in duo mode. */
+		/* TODO: change this to store more pieces at once. */
+		this.firstData = undefined;
 	}
 
+	/* Gives a new value for the active arena. */
 	initializeActiveArena() {
 		if (this.mode == 'solo') {
 			this.activeArena = new Arena(0, 0, this.canvasWidth, this.canvasHeight);
@@ -19,28 +29,28 @@ class Client {
 		}
 	}
 
+	/* Gives a new value for the adversary arena. */
 	initializeAdversaryArena() {
 		this.adversaryArena = new Arena(this.canvasWidth / 2, 0, this.canvasWidth / 2, this.canvasHeight);
 	}
 
-	/* The server says everything is ready to start a new duo game. */
+	/* In duo mode, begin the game only after the server confirms two players have been found. */
 	beginDuoGame(data) {
 		this.initializeActiveArena();
 		this.initializeAdversaryArena();
 		this.activeArena.receiveFirstPieces(data);
 		this.adversaryArena.receiveFirstPieces(data);
-		this.playingDuo = true;
+		this.firstData = data;
 	}
 
 	/* The server tells the client to end the duo game. */
 	endDuoGame() {
 		this.activeArena = undefined;
 		this.adversaryArena = undefined;
-		this.playingDuo = false;
 	}
 
-	/* The server has sent the update on the adversary's arena. */
-	getAdversaryArenaUpdate(data) {
+	/* The server has sent an update on the adversary's arena. */
+	receiveAdversaryArenaUpdate(data) {
 		this.adversaryArena.receiveServerUpdate(data);
 	}
 
@@ -54,21 +64,54 @@ class Client {
 		this.adversaryArena.receiveNextPiece(data);
 	}
 
-	/* The server has sent the new position of the adversary piece. */
-	piecePositionFromServer(data) {
-		this.adversaryArena.receivePiecePosition(data);
+	/* The server updates the position of the adversary piece. */
+	receiveAdversaryPiece(data) {
+		this.adversaryArena.receivePiece(data);
 	}
 
 	/* Gets called when a key is pressed. */
-	keyPressed(code) {
-		if (this.activeArena != undefined) {
-			this.activeArena.keyPressed(code);
+	keyPressed(code, key) {
+		if (key == ' ') {
+			if (this.mode == 'solo') {
+				if (this.lost) {
+					/* Initialize the arena and start playing again. */
+					this.initializeActiveArena();
+					this.lost = false;
+				}
+				else {
+					/* Just toggle the paused state. */
+					this.togglePause();
+				}
+			}
+			else if (this.mode == 'duo') {
+				if (this.lost) {
+					/* This player wants to start again, so initialize the active arena and send in
+					the beginning pieces. */
+					this.initializeActiveArena();
+					this.activeArena.receiveFirstPieces(this.firstData);
+					this.lost = false;
+
+					/* Indicate to the server that the user has started again. */
+					this.sendMessage('startedAgain', {});
+				}
+				else {
+					/* Toggle pause and send a pause event to the server. */
+					this.togglePause();
+					this.sendMessage('pause', {});
+				}
+			}
+		}
+		else {
+			/* For any other key different from SPACE, send the key to the active arena. */
+			if (this.activeArena != undefined && !this.paused && !this.lost) {
+				this.activeArena.keyPressed(code);
+			}
 		}
 	}
 
 	/* Gets called when a key is released. */
 	keyReleased(code) {
-		if (this.activeArena != undefined) {
+		if (this.activeArena != undefined && !this.paused && !this.lost) {
 			this.activeArena.keyReleased(code);
 		}
 	}
@@ -79,6 +122,22 @@ class Client {
 		socket.emit(message, data);
 	}
 
+	/* The arena notifies the client that the player has lost. */
+	playerHasLost() {
+		this.lost = true;
+	}
+
+	/* Toggle the paused state (this event can be sent by the server or performed by the player). */
+	togglePause() {
+		this.paused = this.paused ? false : true;
+	}
+
+	/* The adversary has started again. */
+	startedAgain() {
+		this.initializeAdversaryArena();
+		this.adversaryArena.receiveFirstPieces(this.firstData);
+	}
+
 	/* Main loop that updates the arenas. */
 	update() {
 		/* In solo mode, if the active arena is not defined, define it. */
@@ -86,19 +145,8 @@ class Client {
 			this.initializeActiveArena();
 		}
 
-		/* If in duo mode, create both arenas only in the case that the game has already started. */
-		else if (this.mode == 'duo' && this.playingDuo == true) {
-			if (this.activeArena == undefined) {
-				this.initializeActiveArena();
-			}
-			if (this.adversaryArena == undefined) {
-				this.initializeAdversaryArena();
-			}
-		}
-
-		/* Update only the active arena, and send in the mode so that the arena itself
-		can decide if it has to send updates to the server. */
-		if (this.activeArena != undefined) {
+		/* Update the active arena if not paused and not lost. */
+		if (this.activeArena != undefined && !this.paused && !this.lost) {
 			this.activeArena.update(this.mode);
 		}
 	}
