@@ -11,6 +11,7 @@ class Arena:
 		self.stats = Stats(pieces)
 
 		self.piece = Piece()
+		self.nextPiece = None
 
 	# Receives a JSON object with the new contents of the arena.
 	def update(self, data):
@@ -21,9 +22,12 @@ class Arena:
 		self.grid.update(data['grid'])
 		self.stats.update(data['stats'], self.pieces)
 
+		self.piece.update(data['piece'])
+		self.nextPiece = data['nextPiece']
+
 	# Receives the new position of the falling piece of this arena.
-	def updatePieceFromClient(self, data):
-		self.piece.updateFromServer(data)
+	def updatePiece(self, data):
+		self.piece.update(data)
 
 class Grid:
 	def __init__(self):
@@ -55,7 +59,7 @@ class Piece:
 		self.squares = []
 
 	# Receives the update JSON from the server.
-	def updateFromServer(self, data):
+	def update(self, data):
 		self.squares = []
 		for square in data['squares']:
 			self.squares.append(square)

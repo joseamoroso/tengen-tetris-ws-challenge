@@ -64,15 +64,15 @@ class Piece {
 
 	/* Tries to move the piece in the requested direction. */
 	move(direction, grid) {
-		for (let k = 0; k < this.squares.length; k++) {
-			if (!this.squares[k].canMove(direction, grid)) {
+		for (let square of this.squares) {
+			if (!square.canMove(direction, grid)) {
 				return false;
 			}
 		}
 
 		/* All the squares can move, so the piece can move. */
-		for (let k = 0; k < this.squares.length; k++) {
-			this.squares[k].move(direction);
+		for (let square of this.squares) {
+			square.move(direction);
 		}
 
 		return true;
@@ -82,8 +82,8 @@ class Piece {
 	rotate(grid) {
 		/* Create a new piece that is this one rotated. */
 		let rotatedPiece = this.createRotatedPiece();
-		for (let k = 0; k < rotatedPiece.squares.length; k++) {
-			if (!grid.validPosition(rotatedPiece.squares[k].i, rotatedPiece.squares[k].j)) {
+		for (let square of rotatedPiece.squares) {
+			if (!grid.validPosition(square.i, square.j)) {
 				return false;
 			}
 		}
@@ -97,18 +97,19 @@ class Piece {
 	/* Returns a new piece with the squares of this one rotated. */
 	createRotatedPiece() {
 		let rotatedPiece = new Piece(undefined);
-		for (let k = 0; k < this.squares.length; k++) {
-			/* Rotate this square. */
-			let newSquare = this.squares[k].rotatedFrom(this.center);
+		for (let square of this.squares) {
+			let newSquare = square.rotatedFrom(this.center);
 			rotatedPiece.squares.push(newSquare);
 		}
 		rotatedPiece.center = rotatedPiece.squares[0];
+		rotatedPiece.type = this.type;
 
 		return rotatedPiece;
 	}
 
 	/* Copies the values from the piece given as an argument. */
 	getValuesFrom(piece) {
+		this.type = piece.type;
 		this.squares = [];
 		for (let square of piece.squares) {
 			this.squares.push(new Square(square.i, square.j, true));
@@ -138,8 +139,8 @@ class Piece {
 
 	/* Displays this piece calling display on each of the squares. */
 	display(initialx, initialy, size) {
-		for (let i = 0; i < this.squares.length; i++) {
-			this.squares[i].display(initialx, initialy, size);
+		for (let square of this.squares) {
+			square.display(initialx, initialy, size);
 		}
 	}
 }

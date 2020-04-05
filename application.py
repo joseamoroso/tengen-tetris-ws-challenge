@@ -27,36 +27,43 @@ def duo():
 # A client requests to play in duo mode.
 @socketio.on('requestDuoGame')
 def requestDuoGame(data):
+	master.logMessage('requestDuoGame', request.sid)
 	return master.requestDuoGame(request.sid)
 
-# A client sends an update of its own arena.
-@socketio.on('updateArena')
-def updateArena(data):
-	return master.updateArena(request.sid, data)
-
-# A client disconnects.
+# A client disconnects (closes windows, goes back, etc).
 @socketio.on('disconnect')
 def disconnect():
+	master.logMessage('disconnect', request.sid)
 	return master.disconnect(request.sid)
 
-# A client requests the next piece (only in duo mode).
-@socketio.on('requestNextPiece')
-def requestNextPiece(data):
-	return master.requestNextPiece(request.sid)
+# A player sends an update of its complete arena.
+@socketio.on('updateArena')
+def updateArena(data):
+	master.logMessage('updateArena', request.sid)
+	return master.updateArena(request.sid, data)
 
-# A client sends its new piece position.
-@socketio.on('piece')
-def receivePiece(data):
-	return master.receivePiece(request.sid, data)
+# A player sends an update of the position of its falling piece.
+@socketio.on('updatePiece')
+def updatePiece(data):
+	master.logMessage('upatePiece', request.sid)
+	return master.updatePiece(request.sid, data)
+
+# A player asks for the next batch of pieces.
+@socketio.on('requestNextBatch')
+def requestNextBatch(data):
+	master.logMessage('requestNextBatch', request.sid)
+	return master.requestNextBatch(request.sid)
 
 # A player in duo mode wants to toggle the paused state.
 @socketio.on('pause')
 def pause(data):
+	master.logMessage('pause', request.sid)
 	return master.pause(request.sid)
 
 # A player in duo mode has decided to start over.
 @socketio.on('startedAgain')
 def startedAgain(data):
+	master.logMessage('startedAgain', request.sid)
 	return master.startedAgain(request.sid)
 
 # Run the app with web sockets capabilities.

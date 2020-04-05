@@ -1,3 +1,21 @@
+/* Define the directions of movement of the pieces. */
+const DIR_DOWN = 'down'
+const DIR_RIGHT = 'right'
+const DIR_LEFT = 'left'
+
+/* Scoring system (at level zero) */
+const POINTS = {
+	1: 40,
+	2: 100,
+	3: 300,
+	4: 1200
+};
+
+const DEFAULT_TEXT_SIZE = 16;
+const DEFAULT_BORDER_STROKE_WEIGHT = 3;
+
+const PIECES = ['T', 'J', 'Z', 'O', 'S', 'L', 'I'];
+
 /* This class controls the highest level logic of the game. */
 class Client {
 	constructor(canvasWidth, canvasHeight, mode) {
@@ -6,17 +24,16 @@ class Client {
 		this.canvasHeight = canvasHeight;
 		this.mode = mode;
 
-		/* Create an active arena for the player and adn adversary's arena. */
+		/* Create an active arena for the player and an adversary's arena. */
 		this.activeArena = undefined;
 		this.adversaryArena = undefined;
+
+		/* Create a next piece generator. */
+		this.nextPieceGenerator = new NextPieceGenerator(mode);
 
 		/* High level control of the game. */
 		this.paused = true;
 		this.lost = false;
-
-		/* Some variables in duo mode. */
-		/* TODO: change this to store more pieces at once. */
-		this.firstData = undefined;
 	}
 
 	/* Gives a new value for the active arena. */
@@ -34,13 +51,15 @@ class Client {
 		this.adversaryArena = new Arena(this.canvasWidth / 2, 0, this.canvasWidth / 2, this.canvasHeight);
 	}
 
-	/* In duo mode, begin the game only after the server confirms two players have been found. */
+	/* In duo mode, begin the game when the server has found two players. */
 	beginDuoGame(data) {
 		this.initializeActiveArena();
 		this.initializeAdversaryArena();
-		this.activeArena.receiveFirstPieces(data);
-		this.adversaryArena.receiveFirstPieces(data);
-		this.firstData = data;
+		this.nextPieceGenerator.receiveFirstBatch(data);
+
+		/* Send the first two pieces to both arenas. */
+		this.nextPieceGenerator.sendFirstPieces(this.activeArena);
+		this.nextPieceGenerator.sendFirstPieces(this.adversaryArena);
 	}
 
 	/* The server tells the client to end the duo game. */
@@ -54,14 +73,9 @@ class Client {
 		this.adversaryArena.receiveServerUpdate(data);
 	}
 
-	/* The server has sent the next piece for the active arena in duo mode. */
-	receiveNextPiece(data) {
-		this.activeArena.receiveNextPiece(data);
-	}
-
-	/* The server has sent the adversary's next piece. */
-	receiveAdversaryNextPiece(data) {
-		this.adversaryArena.receiveNextPiece(data);
+	/* The server has sent the next batch to the active arena. */
+	receiveNextBatch(data) {
+		this.nextPieceGenerator.receiveBatch(data);
 	}
 
 	/* The server updates the position of the adversary piece. */
@@ -85,10 +99,9 @@ class Client {
 			}
 			else if (this.mode == 'duo') {
 				if (this.lost) {
-					/* This player wants to start again, so initialize the active arena and send in
-					the beginning pieces. */
+					/* Initialize the active arena and send in the first pieces. */
 					this.initializeActiveArena();
-					this.activeArena.receiveFirstPieces(this.firstData);
+					this.nextPieceGenerator.sendFirstPieces(this.activeArena);
 					this.lost = false;
 
 					/* Indicate to the server that the user has started again. */
@@ -104,7 +117,7 @@ class Client {
 		else {
 			/* For any other key different from SPACE, send the key to the active arena. */
 			if (this.activeArena != undefined && !this.paused && !this.lost) {
-				this.activeArena.keyPressed(code);
+				this.activeArena.keyPressed(code, this.mode);
 			}
 		}
 	}
@@ -135,7 +148,12 @@ class Client {
 	/* The adversary has started again. */
 	startedAgain() {
 		this.initializeAdversaryArena();
-		this.adversaryArena.receiveFirstPieces(this.firstData);
+		this.nextPieceGenerator.sendFirstPieces(this.adversaryArena);
+	}
+
+	/* The arena asks for the next piece. */
+	getNextPiece() {
+		return this.nextPieceGenerator.getNextPiece();
 	}
 
 	/* Main loop that updates the arenas. */
@@ -148,6 +166,11 @@ class Client {
 		/* Update the active arena if not paused and not lost. */
 		if (this.activeArena != undefined && !this.paused && !this.lost) {
 			this.activeArena.update(this.mode);
+		}
+
+		/* Check the next piece generator is updated. */
+		if (this.mode == 'duo' && this.activeArena != undefined) {
+			this.nextPieceGenerator.update();
 		}
 	}
 

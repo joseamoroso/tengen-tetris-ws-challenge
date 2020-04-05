@@ -44,21 +44,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		client.receiveAdversaryArenaUpdate(data);
 	});
 
-	/* The server sends the client the next piece it requested. */
-	socket.on('nextPiece', data => {
-		console.log('Received message: next piece');
-		client.receiveNextPiece(data);
-	});
-
-	/* The server sends the client the adversary's next piece. */
-	socket.on('adversaryNextPiece', data => {
-		console.log('Received message: adversary next piece');
-		client.receiveAdversaryNextPiece(data);
+	/* The server sends the next batch of pieces. */
+	socket.on('nextBatch', data => {
+		console.log('Received message: next batch');
+		client.receiveNextBatch(data);
 	});
 
 	/* The server sends the new position of the adversary piece. */
-	socket.on('adversaryPiece', data => {
-		console.log('Received message: adversary piece');
+	socket.on('updateAdversaryPiece', data => {
+		console.log('Received message: update adversary piece');
 		client.receiveAdversaryPiece(data);
 	});
 

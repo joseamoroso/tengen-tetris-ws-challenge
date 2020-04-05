@@ -1,27 +1,8 @@
-/* Define the directions of movement of the pieces. */
-let DIR_DOWN = 'down'
-let DIR_RIGHT = 'right'
-let DIR_LEFT = 'left'
-
-/* Scoring system (at level zero) */
-let POINTS = {
-	1: 40,
-	2: 100,
-	3: 300,
-	4: 1200
-};
-
-let DEFAULT_TEXT_SIZE = 16;
-let DEFAULT_BORDER_STROKE_WEIGHT = 3;
-
 /* The arena handles all the information about one player. */
 class Arena extends ElementBox {
 	constructor(initialx, initialy, width, height) {
 		/* Call the superclass constructor. */
 		super(initialx, initialy, width, height, true);
-
-		/* Store the list of possible Tetris pieces. */
-		this.possiblePieces = ['T', 'J', 'Z', 'O', 'S', 'L', 'I'];
 
 		/* Create a text message box at the top. */
 		this.messageBox = new TextBox(initialx, initialy, width, height / 10, 'hello', true);
@@ -42,7 +23,7 @@ class Arena extends ElementBox {
 		let scoreLinesMessage = 'SCORE: 0\nLINES: 0';
 		this.scoreLinesBox = new TextBox(initialxRightPanel, initialyRightPanel + heightRightPanel / 8, widthRightPanel, heightRightPanel / 8, scoreLinesMessage, true);
 		this.nextPieceBox = new NextPieceBox(initialxRightPanel, initialyRightPanel + heightRightPanel / 4, widthRightPanel, heightRightPanel / 4);
-		this.statBox = new StatBox(initialxRightPanel, initialyRightPanel + heightRightPanel / 2, widthRightPanel, heightRightPanel / 2, this.possiblePieces);
+		this.statBox = new StatBox(initialxRightPanel, initialyRightPanel + heightRightPanel / 2, widthRightPanel, heightRightPanel / 2);
 
 		/* Create the current piece and the next piece. */
 		this.piece = undefined;
@@ -53,62 +34,45 @@ class Arena extends ElementBox {
 
 		/* Variables for the logic of the game. */
 		this.level = 0;
-		this.downKeyPressed = false;
 		this.score = 0;
 		this.lines = 0;
-
-		/* Variables for communication only happening once. */
-		this.nextPieceRequested = false;
-		this.sendNewPiecePosition = false;
+		this.downKeyPressed = false;
 	}
 
-	/* Update all the elements inside the arena. This function
-	gets called in a loop. */
+	/* Update the elements in the arena. Function called in a loop. */
 	update(mode) {
-		/* When the next piece is undefined. */
+		/* When the next piece is undefined, grab it from the next piece generator. */
 		if (this.nextPiece == undefined) {
-			/* In solo mode, the next piece is created randomly inside the browser. */
-			if (mode == 'solo') {
-				this.nextPiece = this.createNewPiece();
-				this.nextPieceBox.updatePiece(this.nextPiece);
-				this.statBox.updateCounts(this.nextPiece.type);
-			}
-			/* In duo mode, a request has to be sent to the server. */
-			else if (mode == 'duo') {
-				if (!this.nextPieceRequested) {
-					client.sendMessage('updateArena', this.packServerUpdate());
-					client.sendMessage('requestNextPiece', {});
-					this.nextPieceRequested = true;
-				}
+			this.nextPiece = client.getNextPiece();
+			this.nextPieceBox.updatePiece(this.nextPiece);
+
+			/* Only in duo mode, send an update of the current arena. */
+			if (mode == 'duo') {
+				client.sendMessage('updateArena', this.packServerUpdate());
 			}
 		}
 
 		/* When the piece is not defined, grab it from the next piece. */
 		if (this.piece == undefined) {
-			if (this.nextPiece != undefined) {
-				this.piece = new Piece(undefined);
-				this.piece.getValuesFrom(this.nextPiece);
-				this.nextPiece = undefined;
-				this.stopwatch.start();
-			}
-		}
-
-		/* Check if I have to send the piece position to the server. */
-		if (mode == 'duo' && this.sendNewPiecePosition) {
-			client.sendMessage('piece', this.packPiece());
-			this.sendNewPiecePosition = false;
+			this.piece = new Piece(undefined);
+			this.piece.getValuesFrom(this.nextPiece);
+			this.statBox.updateCounts(this.piece.type);
+			this.nextPiece = undefined;
+			this.stopwatch.start();
 		}
 
 		/* If the down key is pressed, directly try to move the piece. */
 		if (this.downKeyPressed) {
 			if (this.stopwatch.getElapsedTime() > 25) {
-				this.movePieceDown();
-				this.sendNewPiecePosition = true;
+				if (this.movePieceDown() && mode == 'duo') {
+					client.sendMessage('updatePiece', this.packPiece());
+				}
 			}
 		}
 		else if (this.stopwatch.getElapsedTime() > 400) {
-			this.movePieceDown();
-			this.sendNewPiecePosition = true;
+			if (this.movePieceDown() && mode == 'duo') {
+				client.sendMessage('updatePiece', this.packPiece());
+			}
 		}
 	}
 
@@ -139,26 +103,21 @@ class Arena extends ElementBox {
 		return true;
 	}
 
-	/* Returns a new piece created randomly from the list. */
-	createNewPiece() {
-		return new Piece(this.possiblePieces[Math.floor(Math.random() * this.possiblePieces.length)]);
-	}
-
 	/* Handles keys pressed on the keyboard. */
-	keyPressed(code) {
+	keyPressed(code, mode) {
 		if (code == LEFT_ARROW) {
-			if (this.piece.move(DIR_LEFT, this.grid)) {
-				this.sendNewPiecePosition = true;
+			if (this.piece.move(DIR_LEFT, this.grid) && mode == 'duo') {
+				client.sendMessage('updatePiece', this.packPiece());
 			}
 		}
 		else if (code == RIGHT_ARROW) {
-			if (this.piece.move(DIR_RIGHT, this.grid)) {
-				this.sendNewPiecePosition = true;
+			if (this.piece.move(DIR_RIGHT, this.grid) && mode == 'duo') {
+				client.sendMessage('updatePiece', this.packPiece());
 			}
 		}
 		else if (code == UP_ARROW) {
-			if (this.piece.rotate(this.grid)) {
-				this.sendNewPiecePosition = true;
+			if (this.piece.rotate(this.grid) && mode == 'duo') {
+				client.sendMessage('updatePiece', this.packPiece());
 			}
 		}
 		else if (code == DOWN_ARROW) {
@@ -199,12 +158,12 @@ class Arena extends ElementBox {
 		this.levelBox.changeText('LEVEL: ' + this.level);
 	}
 
-	/* This arena receives the first piece and the first next piece (duo mode). */
+	/* This arena receives the first two pieces. */
 	receiveFirstPieces(data) {
 		this.nextPiece = new Piece(data['nextPiece']);
 		this.nextPieceBox.updatePiece(this.nextPiece);
-		this.statBox.updateCounts(this.nextPiece.type);
 		this.piece = new Piece(data['piece']);
+		this.statBox.updateCounts(this.piece.type);
 		this.stopwatch.start();
 	}
 
@@ -216,6 +175,8 @@ class Arena extends ElementBox {
 			'lines': this.lines,
 			'grid': this.grid.packServerUpdate(),
 			'stats': this.statBox.packServerUpdate(),
+			'piece': this.piece.packServerUpdate(),
+			'nextPiece': this.nextPiece.type
 		}
 	}
 
@@ -233,6 +194,11 @@ class Arena extends ElementBox {
 		/* Update the grid and the statistics. */
 		this.grid.receiveServerUpdate(data['grid']);
 		this.statBox.receiveServerUpdate(data['stats']);
+
+		/* Update the piece and the next piece. */
+		this.piece.receiveServerUpdate(data['piece']);
+		this.nextPiece = new Piece(data['nextPiece']);
+		this.nextPieceBox.updatePiece(this.nextPiece);
 	}
 
 	/* Packs the falling piece for the server. */
@@ -243,14 +209,6 @@ class Arena extends ElementBox {
 	/* Receives a piece update from the server. */
 	receivePiece(data) {
 		this.piece.receiveServerUpdate(data);
-	}
-
-	/* The server has sent this arena the next piece. */
-	receiveNextPiece(data) {
-		this.nextPiece = new Piece(data['piece']);
-		this.nextPieceBox.updatePiece(this.nextPiece);
-		this.statBox.updateCounts(this.nextPiece.type);
-		this.nextPieceRequested = false;
 	}
 
 	/* Displays all the elements in the arena. */
