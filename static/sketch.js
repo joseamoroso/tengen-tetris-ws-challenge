@@ -39,8 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	/* The server sends the client an update on the adversary's arena. */
-	socket.on('adversaryArenaUpdate', data => {
-		console.log('Received message: get adversary arena update');
+	socket.on('updateAdversaryArena', data => {
+		console.log('Received message: update adversary arena');
 		client.receiveAdversaryArenaUpdate(data);
 	});
 
