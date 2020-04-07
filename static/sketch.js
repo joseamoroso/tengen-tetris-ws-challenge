@@ -69,6 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		client.togglePause();
 	});
 
+	/* The server notifies that the other player has lost (duo mode). */
+	socket.on('lost', data => {
+		console.log('Received message: lost');
+		client.otherPlayerHasLost();
+	})
+
 	/* The other player has decided to start over. */
 	socket.on('startedAgain', data => {
 		console.log('Received message: started again');

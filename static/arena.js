@@ -4,26 +4,20 @@ class Arena extends ElementBox {
 		/* Call the superclass constructor. */
 		super(initialx, initialy, width, height, true);
 
-		/* Create a text message box at the top. */
-		this.messageBox = new TextBox(initialx, initialy, width, height / 10, 'hello', true);
+		/* Create a grid on the left side. */
+		this.grid = new Grid(initialx, initialy, height / 2, height);
 
-		/* Create a grid on the left panel. */
-		let gridHeight = 9 * height / 10;
-		this.grid = new Grid(initialx, initialy + height / 10, gridHeight / 2, gridHeight);
-
-		/* Calculate the position and dimensions of the information panel. */
-		let initialxRightPanel = initialx + gridHeight / 2;
-		let initialyRightPanel = initialy + height / 10;
-		let heightRightPanel = 9 * height / 10;
-		let widthRightPanel = width - (heightRightPanel / 2);
+		/* Calculate positions and dimensions of the right panel. */
+		let initialxRightPanel = initialx + height / 2;
+		let widthRightPanel = width - (height / 2);
 
 		/* Create the elements inside the information panel. */
 		let initialLevelBoxMessage = 'LEVEL: 0';
-		this.levelBox = new TextBox(initialxRightPanel, initialyRightPanel, widthRightPanel, heightRightPanel / 8, initialLevelBoxMessage, true);
+		this.levelBox = new TextBox(initialxRightPanel, initialy, widthRightPanel, height / 8, initialLevelBoxMessage, true);
 		let scoreLinesMessage = 'SCORE: 0\nLINES: 0';
-		this.scoreLinesBox = new TextBox(initialxRightPanel, initialyRightPanel + heightRightPanel / 8, widthRightPanel, heightRightPanel / 8, scoreLinesMessage, true);
-		this.nextPieceBox = new NextPieceBox(initialxRightPanel, initialyRightPanel + heightRightPanel / 4, widthRightPanel, heightRightPanel / 4);
-		this.statBox = new StatBox(initialxRightPanel, initialyRightPanel + heightRightPanel / 2, widthRightPanel, heightRightPanel / 2);
+		this.scoreLinesBox = new TextBox(initialxRightPanel, initialy + height / 8, widthRightPanel, height / 8, scoreLinesMessage, true);
+		this.nextPieceBox = new NextPieceBox(initialxRightPanel, initialy + height / 4, widthRightPanel, height / 4);
+		this.statBox = new StatBox(initialxRightPanel, initialy + height / 2, widthRightPanel, height / 2);
 
 		/* Create the current piece and the next piece. */
 		this.piece = undefined;
@@ -215,8 +209,7 @@ class Arena extends ElementBox {
 	display() {
 		super.display();
 
-		/* Display the top message box and the boxes on the right panel. */
-		this.messageBox.display();
+		/* Display the boxes on the right panel. */
 		this.levelBox.display();
 		this.scoreLinesBox.display();
 		this.nextPieceBox.display();

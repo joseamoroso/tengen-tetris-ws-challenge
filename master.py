@@ -184,6 +184,19 @@ class Master:
 		emit('pause', {}, room=self.getSocketId(adversary))
 		print('Sent pause event to player ' + str(adversary))
 
+	# A player has lost and notifies the other one.
+	def lost(self, socketId):
+		# Check this socket id corresponds to a player.
+		player = self.getPlayerNumber(socketId)
+		if player == None:
+			print('ERROR: cannot handle lost event from client that is not a player')
+			return
+
+		# Send the lost event back to the other player.
+		adversary = self.getAdversaryPlayerNumber(player)
+		emit('lost', {}, room=self.getSocketId(adversary))
+		print('Sent lost event to player ' + str(adversary))
+
 	# A player in duo mode has decided to start again.
 	def startedAgain(self, socketId):
 		# Check the socket id corresponds to a player.

@@ -60,6 +60,12 @@ def pause(data):
 	master.logMessage('pause', request.sid)
 	return master.pause(request.sid)
 
+# A player in duo mode notifies the other one that he has lost.
+@socketio.on('lost')
+def lost(data):
+	master.logMessage('lost', request.sid)
+	return master.lost(request.sid)
+
 # A player in duo mode has decided to start over.
 @socketio.on('startedAgain')
 def startedAgain(data):
