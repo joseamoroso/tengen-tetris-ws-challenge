@@ -25,9 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	/* The server says that the room is currently full. */
-	socket.on('roomCurrentlyFull', data => {
-		console.log('Received message: room currently full');
-		document.querySelector('#duo-content').innerHTML = '<p>Sorry, the room is currently full. Please try again later.</p>';
+	socket.on('allRoomsFull', data => {
+		console.log('Received message: all rooms full');
+		document.querySelector('#duo-content').innerHTML = '<p>Sorry, all rooms are currently full. Please try again later.</p>';
 	});
 
 	/* The server tells us everything is ready to start duo game. Remove everything except the canvas. */

@@ -3,46 +3,58 @@ from random import random
 from math import floor
 
 from arenaElements import Arena
+from rooms import Room
 
-pieces = ['T', 'J', 'Z', 'O', 'S', 'L', 'I']
+roomsNumber = 2
 
 class Master:
 	def __init__(self):
-		# Keep track of the socket ids of each player.
-		self.players = {
-			1: None,
-			2: None
-		}
-
-		# Keep track of the arena states of each player.
-		self.arenas = {
-			1: Arena(1, pieces),
-			2: Arena(2, pieces)
-		}
+		# Create the rooms.
+		self.rooms = {}
+		for i in range(roomsNumber):
+			roomName = 'room{}'.format(i + 1)
+			self.rooms[roomName] = Room(roomName)
 
 		# List of the pieces that will fall for both players.
-		self.pieceList = []
+		#self.pieceList = []
 
 		# Number of next pieces each player has requested.
-		self.piecePosition = {
-			1: 0,
-			2: 0
-		}
+		#self.piecePosition = {
+		#	1: 0,
+		#	2: 0
+		#}
 
 	# Logs an incoming message to the terminal.
 	def logMessage(self, message, socketId):
 		print('-> {} from {}'.format(message, socketId))
 
+	'''
 	def initializePlayers(self):
 		self.players[1] = None
 		self.players[2] = None
 
 	def initializeArenas(self):
 		self.arenas[1] = Arena(1, pieces)
-		self.arenas[2] = Arena(2, pieces)
+		self.arenas[2] = Arena(2, pieces)'''
 
 	# A client with a specific socket id wants to play.
 	def requestDuoGame(self, socketId):
+		# Search for an available room.
+		availableRoom = None
+		for room in rooms.items():
+			if room.numPlayers() < 2:
+				availableRoom = room
+				break
+
+		# If no room is available, notify the client.
+		if availableRoom == None:
+			print('All rooms are currently full')
+			emit('allRoomsFull', {}, room=socketId)
+			return
+
+		# Join the client to the available room.
+		availableRoom.join(socketId)
+		'''
 		if self.isPlayer(socketId):
 			print('Client is already a player')
 			return
@@ -57,8 +69,15 @@ class Master:
 			self.beginDuoGame()
 		else:
 			print('The room is currently full')
-			emit('roomCurrentlyFull', {}, room=socketId)
+			emit('roomCurrentlyFull', {}, room=socketId)'''
 
+	# Returns the room of the socket id, None if not found.
+	def getRoom(self, socketId):
+		for room in self.rooms.items():
+			if room.inRoom(socketId):
+				return room
+		return None
+	'''
 	# Create the first pieces and tell both players they can start playing.
 	def beginDuoGame(self):
 		# Create the first ten pieces in the list and pack them.
@@ -75,16 +94,23 @@ class Master:
 
 		print('Created first ten pieces for duo game: ')
 		print(self.pieceList)
-		emit('beginDuoGame', firstPieces, broadcast=True)
+		emit('beginDuoGame', firstPieces, broadcast=True)'''
 
-	# Called when a socket id disconnects. If a player, remove it from players.
+	'''
+	# Called when a socket id disconnects.
 	def disconnect(self, socketId):
+		for room in self.rooms.items():
+			if room.inRoom(socketId):
+				room.disconnect()
+
+
 		if self.isPlayer(socketId):
 			self.initializePlayers()
 			self.initializeArenas()
 			emit('endDuoGame', {}, broadcast=True)
-			print('Sent end duo game message to both players')
+			print('Sent end duo game message to both players')'''
 
+	'''
 	def getAdversaryPlayerNumber(self, playerNumber):
 		return 1 if playerNumber == 2 else 2
 
@@ -103,24 +129,28 @@ class Master:
 		elif self.players[2] == socketId:
 			return 2
 		else:
-			return None
+			return None'''
 
+	'''
 	# Receives the player number and returns its socket id.
 	def getSocketId(self, playerNumber):
 		if playerNumber == 1 or playerNumber == 2:
 			return self.players[playerNumber]
 		else:
 			print('ERROR: cannot get socket id of player number ' + playerNumber)
-			return None
+			return None'''
 
 	# A player requests the next batch of pieces.
 	def requestNextBatch(self, socketId):
-		# Check that the socket id is a player.
-		player = self.getPlayerNumber(socketId)
-		if player == None:
-			print('ERROR: cannot send next batch to a socket id that is not a player')
+		# Look for the room of this player.
+		room = self.getRoom(socketId)
+		if room == None:
 			return
 
+		# Request the next batch of the appropriate room.
+		room.requestNextBatch(socketId)
+
+		'''
 		# If master does not have the next ten pieces ready, create as many as needed.
 		if self.piecePosition[player] + 10 > len(self.pieceList):
 			for i in range(len(self.pieceList) - 1, self.piecePosition[player] + 10):
@@ -136,10 +166,18 @@ class Master:
 		self.piecePosition[player] += 10
 
 		# Send the batch to the player that requested it.
-		emit('nextBatch', nextBatch, room=socketId)
+		emit('nextBatch', nextBatch, room=socketId)'''
 
 	# Receives a JSON object with the new contents of a player's arena.
 	def updateArena(self, socketId, data):
+		# Look for the room of this player.
+		room = self.getRoom(socketId)
+		if room == None:
+			return
+
+
+
+
 		# Check that this socket id corresponds to a player.
 		player = self.getPlayerNumber(socketId)
 		if player == None:
