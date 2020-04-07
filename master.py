@@ -41,6 +41,18 @@ class Master:
 		self.arenas[1] = Arena(1, pieces)
 		self.arenas[2] = Arena(2, pieces)
 
+	# Bounce a message from one player to the other.
+	def bounce(self, socketId, message, data):
+		# Check that this client is a player.
+		player = self.getPlayerNumber(socketId)
+		if player == None:
+			print('ERROR: cannot bounce message ' + message)
+			return False
+
+		# Send the same message, with the same data, to the socket id of the other player.
+		emit(message, data, room=self.getSocketId(self.getAdversaryPlayerNumber(player)))
+		return True
+
 	# A client with a specific socket id wants to play.
 	def requestDuoGame(self, socketId):
 		if self.isPlayer(socketId):
@@ -140,75 +152,39 @@ class Master:
 
 	# Receives a JSON object with the new contents of a player's arena.
 	def updateArena(self, socketId, data):
-		# Check that this socket id corresponds to a player.
-		player = self.getPlayerNumber(socketId)
-		if player == None:
-			print('ERROR: the socket id received in update arena does not correspond to a player')
+		# Bounce the message to the other player.
+		if not self.bounce(socketId, 'updateAdversaryArena', data):
 			return
 
 		# Update the corresponding arena.
-		self.arenas[player].update(data)
-		print('Updated the arena of player ' + str(player))
-
-		# Update the other player's adversary arena.
-		adversary = self.getAdversaryPlayerNumber(player)
-		emit('adversaryArenaUpdate', data, room=self.getSocketId(adversary))
-		print('Sent an arena update to adversary player ' + str(adversary))
+		self.arenas[self.getPlayerNumber(socketId)].update(data)
 
 	# A player sends the new position of its falling piece.
 	def updatePiece(self, socketId, data):
-		# Check this socket id is a player.
-		player = self.getPlayerNumber(socketId)
-		if player == None:
-			print('ERROR: cannot receive a piece update from a client that is not a player')
+		# Bounce the message to the other player.
+		if not self.bounce(socketId, 'updateAdversaryPiece', data):
 			return
 
 		# Update the piece of the player that has sent the request.
-		self.arenas[player].updatePiece(data)
-
-		# Send this update to the other player.
-		adversary = self.getAdversaryPlayerNumber(player)
-		emit('updateAdversaryPiece', data, room=self.getSocketId(adversary))
-		print('Sent new position of adversary piece to player ' + str(adversary))
+		self.arenas[self.getPlayerNumber(socketId)].updatePiece(data)
 
 	# A player wants to toggle the paused state.
 	def pause(self, socketId):
-		# Check the socket id corresponds to a player.
-		player = self.getPlayerNumber(socketId)
-		if player == None:
-			print('ERROR: cannot handle pause message from client that is not a player')
+		# Bounce the message to the other player.
+		if not self.bounce(socketId, 'pause', {}):
 			return
-
-		# Send this pause event back to the other player.
-		adversary = self.getAdversaryPlayerNumber(player)
-		emit('pause', {}, room=self.getSocketId(adversary))
-		print('Sent pause event to player ' + str(adversary))
 
 	# A player has lost and notifies the other one.
 	def lost(self, socketId):
-		# Check this socket id corresponds to a player.
-		player = self.getPlayerNumber(socketId)
-		if player == None:
-			print('ERROR: cannot handle lost event from client that is not a player')
+		# Bounce the message to the other player.
+		if not self.bounce(socketId, 'lost', {}):
 			return
-
-		# Send the lost event back to the other player.
-		adversary = self.getAdversaryPlayerNumber(player)
-		emit('lost', {}, room=self.getSocketId(adversary))
-		print('Sent lost event to player ' + str(adversary))
 
 	# A player in duo mode has decided to start again.
 	def startedAgain(self, socketId):
-		# Check the socket id corresponds to a player.
-		player = self.getPlayerNumber(socketId)
-		if player == None:
-			print('ERROR: cannot handle startedAgain message from client that is not a player')
+		# Bounce the message to the other player.
+		if not self.bounce(socketId, 'startedAgain', {}):
 			return
 
 		# Reset the piece position of this player.
-		self.piecePosition[player] = 10
-
-		# Send this pause event back to the other player.
-		adversary = self.getAdversaryPlayerNumber(player)
-		emit('startedAgain', {}, room=self.getSocketId(adversary))
-		print('Sent started again event to player ' + str(adversary))
+		self.piecePosition[self.getPlayerNumber(socketId)] = 10
