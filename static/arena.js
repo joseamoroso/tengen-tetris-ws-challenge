@@ -1,23 +1,31 @@
 /* The arena handles all the information about one player. */
 class Arena extends ElementBox {
-	constructor(initialx, initialy, width, height) {
+	constructor(initialx, initialy, width, height, mirror) {
 		/* Call the superclass constructor. */
 		super(initialx, initialy, width, height, true);
 
-		/* Create a grid on the left side. */
-		this.grid = new Grid(initialx, initialy, height / 2, height);
+		/* Decide dimensions and initial positions. */
+		let widthPanel = width - height / 2;
+		let initialxGrid, initialxPanel;
+		if (!mirror) {
+			initialxGrid = initialx;
+			initialxPanel = initialx + height / 2;
+		}
+		else {
+			initialxPanel = initialx;
+			initialxGrid = initialx + widthPanel;
+		}
 
-		/* Calculate positions and dimensions of the right panel. */
-		let initialxRightPanel = initialx + height / 2;
-		let widthRightPanel = width - (height / 2);
+		/* Create the grid. */
+		this.grid = new Grid(initialxGrid, initialy, height / 2, height);
 
-		/* Create the elements inside the information panel. */
+		/* Create the elements of the panel. */
 		let initialLevelBoxMessage = 'LEVEL: 0';
-		this.levelBox = new TextBox(initialxRightPanel, initialy, widthRightPanel, height / 8, initialLevelBoxMessage, true);
+		this.levelBox = new TextBox(initialxPanel, initialy, widthPanel, height / 8, initialLevelBoxMessage, true);
 		let scoreLinesMessage = 'SCORE: 0\nLINES: 0';
-		this.scoreLinesBox = new TextBox(initialxRightPanel, initialy + height / 8, widthRightPanel, height / 8, scoreLinesMessage, true);
-		this.nextPieceBox = new NextPieceBox(initialxRightPanel, initialy + height / 4, widthRightPanel, height / 4);
-		this.statBox = new StatBox(initialxRightPanel, initialy + height / 2, widthRightPanel, height / 2);
+		this.scoreLinesBox = new TextBox(initialxPanel, initialy + height / 8, widthPanel, height / 8, scoreLinesMessage, true);
+		this.nextPieceBox = new NextPieceBox(initialxPanel, initialy + height / 4, widthPanel, height / 4);
+		this.statBox = new StatBox(initialxPanel, initialy + height / 2, widthPanel, height / 2);
 
 		/* Create the current piece and the next piece. */
 		this.piece = undefined;

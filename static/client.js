@@ -56,16 +56,16 @@ class Client {
 	/* Gives a new value for the active arena. */
 	initializeActiveArena() {
 		if (this.mode == 'solo') {
-			this.activeArena = new Arena(0, this.canvasHeight / 10, this.canvasWidth, 9 * this.canvasHeight / 10);
+			this.activeArena = new Arena(0, this.canvasHeight / 10, this.canvasWidth, 9 * this.canvasHeight / 10, false);
 		}
 		else if (this.mode == 'duo') {
-			this.activeArena = new Arena(0, this.canvasHeight / 10, this.canvasWidth / 2, 9 * this.canvasHeight / 10);
+			this.activeArena = new Arena(0, this.canvasHeight / 10, this.canvasWidth / 2, 9 * this.canvasHeight / 10, false);
 		}
 	}
 
 	/* Gives a new value for the adversary arena. */
 	initializeAdversaryArena() {
-		this.adversaryArena = new Arena(this.canvasWidth / 2, this.canvasHeight / 10, this.canvasWidth / 2, 9 * this.canvasHeight / 10);
+		this.adversaryArena = new Arena(this.canvasWidth / 2, this.canvasHeight / 10, this.canvasWidth / 2, 9 * this.canvasHeight / 10, true);
 	}
 
 	/* In duo mode, begin the game when the server has found two players. */
