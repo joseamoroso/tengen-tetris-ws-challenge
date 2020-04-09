@@ -63,13 +63,13 @@ def pause(data):
 @socketio.on('lost')
 def lost(data):
 	master.logMessage('lost', request.sid)
-	return master.lost(request.sid)
+	return master.lost(request.sid, data)
 
 # A player in duo mode has decided to start over.
 @socketio.on('startedAgain')
 def startedAgain(data):
 	master.logMessage('startedAgain', request.sid)
-	return master.startedAgain(request.sid)
+	return master.startedAgain(request.sid, data)
 
 # Run the app with web sockets capabilities.
 if __name__ == '__main__':

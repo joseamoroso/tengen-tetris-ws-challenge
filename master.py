@@ -84,15 +84,15 @@ class Master:
 		return self.bounce(socketId, 'pause', {})
 
 	# A player has lost and notifies the other one.
-	def lost(self, socketId):
-		return self.bounce(socketId, 'lost', {})
+	def lost(self, socketId, data):
+		return self.bounce(socketId, 'lost', data)
 
 	# A player in duo mode has decided to start again.
-	def startedAgain(self, socketId):
+	def startedAgain(self, socketId, data):
 		# Find the room of the player.
 		room = self.getRoom(socketId)
 		if room == None:
 			return False
 
 		# Call the function of the appropriate room.
-		return room.startedAgain(socketId)
+		return room.startedAgain(socketId, data)

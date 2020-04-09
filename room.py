@@ -150,9 +150,9 @@ class Room:
 		return True
 
 	# A player in this room has started again.
-	def startedAgain(self, socketId):
+	def startedAgain(self, socketId, data):
 		# Bounce the message back to the other player in the room.
-		self.bounce(socketId, 'startedAgain', {})
+		self.bounce(socketId, 'startedAgain', data)
 
 		# Reset the piece position of this player.
 		self.position[self.getPlayerNumber(socketId)] = 10

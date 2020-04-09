@@ -51,6 +51,9 @@ class Client {
 		/* High level control of the game. */
 		this.paused = mode == 'solo' ? false : true;
 		this.lost = false;
+
+		/* Keep track of the high score. */
+		this.highScore = 0;
 	}
 
 	/* Gives a new value for the active arena. */
@@ -118,6 +121,7 @@ class Client {
 		else if (code == ENTER && this.lost && !this.paused) {
 			this.lost = false;
 			this.initializeActiveArena();
+			this.activeArena.setHighScore(this.highScore);
 
 			/* Change the messages. */
 			if (this.mode == 'solo') {
@@ -131,7 +135,7 @@ class Client {
 			if (this.mode == 'duo') {
 				this.nextPieceGenerator.initialize();
 				this.nextPieceGenerator.sendFirstPieces(this.activeArena);
-				this.sendMessage('startedAgain', {});
+				this.sendMessage('startedAgain', {'high': this.highScore});
 			}
 		}
 		else {
@@ -158,6 +162,7 @@ class Client {
 	/* The arena notifies the client that this player has lost. */
 	playerHasLost() {
 		this.lost = true;
+		this.highScore = this.activeArena.getHighScore();
 
 		/* Change the message and notify the other client if needed. */
 		if (this.mode == 'solo') {
@@ -165,12 +170,13 @@ class Client {
 		}
 		else if (this.mode == 'duo') {
 			this.activeMessageBox.changeText(MESSAGES['lost']);
-			this.sendMessage('lost', {});
+			this.sendMessage('lost', {'high': this.highScore});
 		}
 	}
 
 	/* The server notifies me that the other player has lost. */
-	otherPlayerHasLost() {
+	otherPlayerHasLost(data) {
+		this.adversaryArena.setHighScore(data['high']);
 		this.adversaryMessageBox.changeText(MESSAGES['lost']);
 	}
 
@@ -189,9 +195,10 @@ class Client {
 	}
 
 	/* The adversary has started again. */
-	startedAgain() {
+	startedAgain(data) {
 		this.initializeAdversaryArena();
 		this.nextPieceGenerator.sendFirstPieces(this.adversaryArena);
+		this.adversaryArena.setHighScore(data['high']);
 		this.adversaryMessageBox.changeText('');
 	}
 

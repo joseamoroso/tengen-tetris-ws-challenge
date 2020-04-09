@@ -72,13 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	/* The server notifies that the other player has lost (duo mode). */
 	socket.on('lost', data => {
 		console.log('Received message: lost');
-		client.otherPlayerHasLost();
+		client.otherPlayerHasLost(data);
 	})
 
 	/* The other player has decided to start over. */
 	socket.on('startedAgain', data => {
 		console.log('Received message: started again');
-		client.startedAgain();
+		client.startedAgain(data);
 	});
 });
 

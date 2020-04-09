@@ -20,10 +20,10 @@ class Arena extends ElementBox {
 		this.grid = new Grid(initialxGrid, initialy, height / 2, height);
 
 		/* Create the elements of the panel. */
-		let initialLevelBoxMessage = 'LEVEL: 0';
-		this.levelBox = new TextBox(initialxPanel, initialy, widthPanel, height / 8, initialLevelBoxMessage, true);
-		let scoreLinesMessage = 'SCORE: 0\nLINES: 0';
-		this.scoreLinesBox = new TextBox(initialxPanel, initialy + height / 8, widthPanel, height / 8, scoreLinesMessage, true);
+		let initialScoreBoxMessage = 'SCORE: 0\nHIGH: 0';
+		this.scoreBox = new TextBox(initialxPanel, initialy, widthPanel, height / 8, initialScoreBoxMessage, true);
+		let initialLevelLinesBoxMessage = 'LEVEL: 0\nLINES: 0';
+		this.levelLinesBox = new TextBox(initialxPanel, initialy + height / 8, widthPanel, height / 8, initialLevelLinesBoxMessage, true);
 		this.nextPieceBox = new NextPieceBox(initialxPanel, initialy + height / 4, widthPanel, height / 4);
 		this.statBox = new StatBox(initialxPanel, initialy + height / 2, widthPanel, height / 2);
 
@@ -36,6 +36,7 @@ class Arena extends ElementBox {
 
 		/* Variables for the logic of the game. */
 		this.level = 0;
+		this.high = 0;
 		this.score = 0;
 		this.lines = 0;
 		this.downKeyPressed = false;
@@ -86,14 +87,15 @@ class Arena extends ElementBox {
 			this.grid.receive(this.piece);
 			this.piece = undefined;
 
-			/* Assign score in the current grid and clean squares. */
+			/* Get the score of the current drop to the grid. */
 			let result = this.grid.assignScoresAndClean();
 			this.score += result['score'];
 			this.lines += result['lines'];
-			this.updateScoreLinesBox();
-
-			/* Check if the player has to change level. */
 			this.checkLevel();
+
+			/* Update the necessary boxes. */
+			this.updateLevelLinesBox();
+			this.updateScoreBox();
 
 			/* Check if this player has lost. */
 			this.checkLose();
@@ -138,26 +140,44 @@ class Arena extends ElementBox {
 	checkLose() {
 		for (let j = 0; j < 10; j++) {
 			if (this.grid.squares[0][j].visible) {
+				/* Update the high score if needed. */
+				if (this.score > this.high) {
+					this.high = this.score;
+					this.updateScoreBox();
+				}
+
 				client.playerHasLost();
+				return true;
 			}
 		}
+
+		return false;
 	}
 
 	/* Checks if the player has cleared enough lines to level up. */
 	checkLevel() {
 		this.level = Math.floor(this.lines / 10);
-		this.updateLevelBox();
 	}
 
-	/* Updates the score and lines box with the new values. */
-	updateScoreLinesBox() {
-		let text = 'SCORE: ' + this.score + '\nLINES: ' + this.lines;
-		this.scoreLinesBox.changeText(text);
+	/* Updates the text inside the level lines box. */
+	updateLevelLinesBox() {
+		this.levelLinesBox.changeText('LEVEL: ' + this.level + '\nLINES: ' + this.lines);
 	}
 
-	/* Updates the level box with the new level. */
-	updateLevelBox() {
-		this.levelBox.changeText('LEVEL: ' + this.level);
+	/* Updates the text inside the score box. */
+	updateScoreBox() {
+		this.scoreBox.changeText('SCORE: ' + this.score + '\nHIGH: ' + this.high);
+	}
+
+	/* Returns the current high score. */
+	getHighScore() {
+		return this.high;
+	}
+
+	/* Sets the high score. */
+	setHighScore(high) {
+		this.high = high;
+		this.updateScoreBox();
 	}
 
 	/* This arena receives the first two pieces. */
@@ -172,8 +192,9 @@ class Arena extends ElementBox {
 	/* Packs the arena's information to be sent to the server. */
 	packServerUpdate() {
 		return {
-			'level': this.level,
 			'score': this.score,
+			'high': this.high,
+			'level': this.level,
 			'lines': this.lines,
 			'grid': this.grid.packServerUpdate(),
 			'stats': this.statBox.packServerUpdate(),
@@ -185,13 +206,14 @@ class Arena extends ElementBox {
 	/* The server has sent an update on the adversary's arena. */
 	receiveServerUpdate(data) {
 		/* Keep a copy of the numerical values. */
-		this.level = data['level'];
 		this.score = data['score'];
+		this.high = data['high'];
+		this.level = data['level'];
 		this.lines = data['lines'];
 
 		/* Upate the text boxes. */
-		this.updateLevelBox();
-		this.updateScoreLinesBox();
+		this.updateLevelLinesBox();
+		this.updateScoreBox();
 
 		/* Update the grid and the statistics. */
 		this.grid.receiveServerUpdate(data['grid']);
@@ -218,8 +240,8 @@ class Arena extends ElementBox {
 		super.display();
 
 		/* Display the boxes on the right panel. */
-		this.levelBox.display();
-		this.scoreLinesBox.display();
+		this.scoreBox.display();
+		this.levelLinesBox.display();
 		this.nextPieceBox.display();
 		this.statBox.display();
 
