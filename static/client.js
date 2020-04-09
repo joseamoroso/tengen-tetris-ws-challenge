@@ -74,6 +74,9 @@ class Client {
 		this.initializeAdversaryArena();
 		this.nextPieceGenerator.receiveFirstBatch(data);
 
+		/* Initialize the next piece generator. */
+		this.nextPieceGenerator.initialize();
+
 		/* Send the first two pieces to both arenas. */
 		this.nextPieceGenerator.sendFirstPieces(this.activeArena);
 		this.nextPieceGenerator.sendFirstPieces(this.adversaryArena);
@@ -126,6 +129,7 @@ class Client {
 
 			/* In duo mode, send in the first pieces and notify the server. */
 			if (this.mode == 'duo') {
+				this.nextPieceGenerator.initialize();
 				this.nextPieceGenerator.sendFirstPieces(this.activeArena);
 				this.sendMessage('startedAgain', {});
 			}

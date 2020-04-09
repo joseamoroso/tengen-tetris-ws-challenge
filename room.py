@@ -87,6 +87,11 @@ class Room:
 	def inRoom(self, socketId):
 		return self.ids[1] == socketId or self.ids[2] == socketId
 
+	# Logs the pieces in this room to the terminal.
+	def logPieces(self):
+		print('Current pieces in room {}:'.format(self.name))
+		print(self.pieces)
+
 	# Starts the duo game.
 	def beginDuoGame(self):
 		# Create the first ten pieces and pack them.
@@ -94,12 +99,19 @@ class Room:
 		for i in range(10):
 			self.pieces.append(self.possiblePieces[floor(random() * len(self.possiblePieces))])
 		firstPieces = {'pieces': self.pieces}
+		self.logPieces()
 
 		# Initialize the counter for both players.
 		self.position[1] = 10
 		self.position[2] = 10
 
 		emit('beginDuoGame', firstPieces, room=self.name)
+
+	# Appends the requested number of pieces to the list in this room.
+	def createNewPieces(self, numPieces):
+		for i in range(numPieces):
+			self.pieces.append(self.possiblePieces[floor(random() * len(self.possiblePieces))])
+		self.logPieces()
 
 	# Bounce a message to the other player in this room.
 	def bounce(self, socketId, message, data):
@@ -121,6 +133,7 @@ class Room:
 
 		# If I do not have the ten next pieces ready, create as many as needed.
 		if self.position[player] + 10 > len(self.pieces):
+			self.createNewPieces(self.position[player] + 10 - (len(self.pieces) - 1))
 			for i in range(len(self.pieces) - 1, self.position[player] + 10):
 				self.pieces.append(self.possiblePieces[floor(random() * len(self.possiblePieces))])
 

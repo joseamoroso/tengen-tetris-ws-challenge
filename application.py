@@ -45,7 +45,6 @@ def updateArena(data):
 # A player sends an update of the position of its falling piece.
 @socketio.on('updatePiece')
 def updatePiece(data):
-	master.logMessage('upatePiece', request.sid)
 	return master.updatePiece(request.sid, data)
 
 # A player asks for the next batch of pieces.

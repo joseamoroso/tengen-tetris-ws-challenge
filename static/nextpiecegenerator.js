@@ -22,6 +22,15 @@ class NextPieceGenerator {
 		}
 	}
 
+	/* Leaves the next piece generator ready for a new game. */
+	initialize() {
+		/* Copy the first batch into the piece buffer, except the first two pieces. */
+		this.pieceBuffer = [];
+		for (let i = 2; i < this.firstBatch.length; i++) {
+			this.pieceBuffer.push(this.firstBatch[i]);
+		}
+	}
+
 	/* Sends the first two pieces to the arena specified as an argument. */
 	sendFirstPieces(arena) {
 		arena.receiveFirstPieces({
