@@ -133,7 +133,7 @@ class Room:
 
 		# If I do not have the ten next pieces ready, create as many as needed.
 		if self.position[player] + 10 > len(self.pieces):
-			self.createNewPieces(self.position[player] + 10 - (len(self.pieces) - 1))
+			self.createNewPieces(self.position[player] + 10 - len(self.pieces))
 			for i in range(len(self.pieces) - 1, self.position[player] + 10):
 				self.pieces.append(self.possiblePieces[floor(random() * len(self.possiblePieces))])
 

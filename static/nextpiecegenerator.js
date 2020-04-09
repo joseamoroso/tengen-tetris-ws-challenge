@@ -2,6 +2,7 @@
 class NextPieceGenerator {
 	constructor(mode) {
 		this.mode = mode;
+		this.waitingAnswer = false;
 
 		this.pieceBuffer = [];
 		this.firstBatch = [];
@@ -20,6 +21,7 @@ class NextPieceGenerator {
 		for (let piece of data['pieces']) {
 			this.pieceBuffer.push(piece);
 		}
+		this.waitingAnswer = false;
 	}
 
 	/* Leaves the next piece generator ready for a new game. */
@@ -54,8 +56,9 @@ class NextPieceGenerator {
 
 	/* If there are less than ten pieces in the buffer, ask the server for more. */
 	update() {
-		if (this.mode == 'duo' && this.pieceBuffer.length < 10) {
+		if (this.mode == 'duo' && this.pieceBuffer.length < 10 && !this.waitingAnswer) {
 			client.sendMessage('requestNextBatch', {});
+			this.waitingAnswer = true;
 		}
 	}
 }
