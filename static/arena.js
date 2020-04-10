@@ -40,41 +40,55 @@ class Arena extends ElementBox {
 		this.score = 0;
 		this.lines = 0;
 		this.downKeyPressed = false;
+
+		/* Establish the initial state of the arena. */
+		this.state = STATE_SELECT_LEVEL;
+
+		/* Create the level selector box. */
+		let levelOptions = Array.from({length: 10}, (value, index) => index);
+		let levelSelectorTitle = 'SELECT LEVEL';
+		let boxWidth = width / 2;
+		let boxHeight = 3 * height / 4;
+		let initialxBox = initialx + (width - boxWidth) / 2;
+		let initialyBox = initialy + (height - boxHeight) / 2;
+		this.levelSelectorBox = new SelectorBox(initialxBox, initialyBox, boxWidth, boxHeight, levelSelectorTitle, levelOptions);
 	}
 
 	/* Update the elements in the arena. Function called in a loop. */
 	update(mode) {
-		/* When the next piece is undefined, grab it from the next piece generator. */
-		if (this.nextPiece == undefined) {
-			this.nextPiece = client.getNextPiece();
-			this.nextPieceBox.updatePiece(this.nextPiece);
+		if (this.state == STATE_PLAY) {
+			/* When the next piece is undefined, grab it from the next piece generator. */
+			if (this.nextPiece == undefined) {
+				this.nextPiece = client.getNextPiece();
+				this.nextPieceBox.updatePiece(this.nextPiece);
 
-			/* Only in duo mode, send an update of the current arena. */
-			if (mode == 'duo') {
-				client.sendMessage('updateArena', this.packServerUpdate());
+				/* Only in duo mode, send an update of the current arena. */
+				if (mode == 'duo') {
+					client.sendMessage('updateArena', this.packServerUpdate());
+				}
 			}
-		}
 
-		/* When the piece is not defined, grab it from the next piece. */
-		if (this.piece == undefined) {
-			this.piece = new Piece(undefined);
-			this.piece.getValuesFrom(this.nextPiece);
-			this.statBox.updateCounts(this.piece.type);
-			this.nextPiece = undefined;
-			this.stopwatch.start();
-		}
+			/* When the piece is not defined, grab it from the next piece. */
+			if (this.piece == undefined) {
+				this.piece = new Piece(undefined);
+				this.piece.getValuesFrom(this.nextPiece);
+				this.statBox.updateCounts(this.piece.type);
+				this.nextPiece = undefined;
+				this.stopwatch.start();
+			}
 
-		/* If the down key is pressed, directly try to move the piece. */
-		if (this.downKeyPressed) {
-			if (this.stopwatch.getElapsedTime() > 25) {
+			/* If the down key is pressed, directly try to move the piece. */
+			if (this.downKeyPressed) {
+				if (this.stopwatch.getElapsedTime() > 25) {
+					if (this.movePieceDown() && mode == 'duo') {
+						client.sendMessage('updatePiece', this.packPiece());
+					}
+				}
+			}
+			else if (this.stopwatch.getElapsedTime() > 400) {
 				if (this.movePieceDown() && mode == 'duo') {
 					client.sendMessage('updatePiece', this.packPiece());
 				}
-			}
-		}
-		else if (this.stopwatch.getElapsedTime() > 400) {
-			if (this.movePieceDown() && mode == 'duo') {
-				client.sendMessage('updatePiece', this.packPiece());
 			}
 		}
 	}
@@ -109,23 +123,35 @@ class Arena extends ElementBox {
 
 	/* Handles keys pressed on the keyboard. */
 	keyPressed(code, mode) {
-		if (code == LEFT_ARROW) {
-			if (this.piece.move(DIR_LEFT, this.grid) && mode == 'duo') {
-				client.sendMessage('updatePiece', this.packPiece());
+		if (this.state == STATE_SELECT_LEVEL) {
+			if (code == UP_ARROW || code == DOWN_ARROW) {
+				this.levelSelectorBox.keyPressed(code);
+			}
+			else if (code == ENTER) {
+				this.level = this.levelSelectorBox.getActiveTickBoxIndex();
+				this.updateLevelLinesBox();
+				this.state = STATE_PLAY;
 			}
 		}
-		else if (code == RIGHT_ARROW) {
-			if (this.piece.move(DIR_RIGHT, this.grid) && mode == 'duo') {
-				client.sendMessage('updatePiece', this.packPiece());
+		else if (this.state == STATE_PLAY) {
+			if (code == LEFT_ARROW) {
+				if (this.piece.move(DIR_LEFT, this.grid) && mode == 'duo') {
+					client.sendMessage('updatePiece', this.packPiece());
+				}
 			}
-		}
-		else if (code == UP_ARROW) {
-			if (this.piece.rotate(this.grid) && mode == 'duo') {
-				client.sendMessage('updatePiece', this.packPiece());
+			else if (code == RIGHT_ARROW) {
+				if (this.piece.move(DIR_RIGHT, this.grid) && mode == 'duo') {
+					client.sendMessage('updatePiece', this.packPiece());
+				}
 			}
-		}
-		else if (code == DOWN_ARROW) {
-			this.downKeyPressed = true;
+			else if (code == UP_ARROW) {
+				if (this.piece.rotate(this.grid) && mode == 'duo') {
+					client.sendMessage('updatePiece', this.packPiece());
+				}
+			}
+			else if (code == DOWN_ARROW) {
+				this.downKeyPressed = true;
+			}
 		}
 	}
 
@@ -239,18 +265,23 @@ class Arena extends ElementBox {
 	display() {
 		super.display();
 
-		/* Display the boxes on the right panel. */
-		this.scoreBox.display();
-		this.levelLinesBox.display();
-		this.nextPieceBox.display();
-		this.statBox.display();
-
-		/* Display the falling piece. */
-		if (this.piece != undefined) {
-			this.piece.display(this.grid.initialx, this.grid.initialy, this.grid.squareSize);
+		if (this.state == STATE_SELECT_LEVEL) {
+			this.levelSelectorBox.display();
 		}
+		else if (this.state == STATE_PLAY) {
+			/* Display the boxes on the right panel. */
+			this.scoreBox.display();
+			this.levelLinesBox.display();
+			this.nextPieceBox.display();
+			this.statBox.display();
 
-		/* Display the grid. */
-		this.grid.display();
+			/* Display the falling piece. */
+			if (this.piece != undefined) {
+				this.piece.display(this.grid.initialx, this.grid.initialy, this.grid.squareSize);
+			}
+
+			/* Display the grid. */
+			this.grid.display();
+		}
 	}
 }

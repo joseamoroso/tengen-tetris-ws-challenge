@@ -13,6 +13,7 @@ const POINTS = {
 
 const DEFAULT_TEXT_SIZE = 16;
 const DEFAULT_BORDER_STROKE_WEIGHT = 3;
+const TICK_DIAMETER = 10;
 
 const PIECES = ['T', 'J', 'Z', 'O', 'S', 'L', 'I'];
 
@@ -20,6 +21,9 @@ const MESSAGES = {
 	'paused': 'PAUSED',
 	'lost': 'GAME OVER'
 };
+
+const STATE_SELECT_LEVEL = 'selectLevel';
+const STATE_PLAY = 'play';
 
 /* This class controls the highest level logic of the game. */
 class Client {
