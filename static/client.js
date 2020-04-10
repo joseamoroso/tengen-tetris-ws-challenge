@@ -15,6 +15,10 @@ const DEFAULT_TEXT_SIZE = 16;
 const DEFAULT_BORDER_STROKE_WEIGHT = 3;
 const TICK_DIAMETER = 10;
 
+const TEXT_TRY_AGAIN = 'TRY AGAIN';
+const TEXT_SUBMIT_HIGH_SCORE = 'SUBMIT HIGH';
+const TEXT_GAME_OVER = 'GAME OVER';
+
 const PIECES = ['T', 'J', 'Z', 'O', 'S', 'L', 'I'];
 
 const MESSAGES = {
@@ -24,6 +28,7 @@ const MESSAGES = {
 
 const STATE_SELECT_LEVEL = 'selectLevel';
 const STATE_PLAY = 'play';
+const STATE_GAME_OVER = 'gameOver';
 
 /* This class controls the highest level logic of the game. */
 class Client {
@@ -122,29 +127,9 @@ class Client {
 				this.sendMessage('pause', {});
 			}
 		}
-		else if (code == ENTER && this.lost && !this.paused) {
-			this.lost = false;
-			this.initializeActiveArena();
-			this.activeArena.setHighScore(this.highScore);
-
-			/* Change the messages. */
-			if (this.mode == 'solo') {
-				this.soloMessageBox.changeText('');
-			}
-			else if (this.mode == 'duo') {
-				this.activeMessageBox.changeText('');
-			}
-
-			/* In duo mode, send in the first pieces and notify the server. */
-			if (this.mode == 'duo') {
-				this.nextPieceGenerator.initialize();
-				this.nextPieceGenerator.sendFirstPieces(this.activeArena);
-				this.sendMessage('startedAgain', {'high': this.highScore});
-			}
-		}
 		else {
 			/* For any other key, send the key to the active arena. */
-			if (this.activeArena != undefined && !this.paused && !this.lost) {
+			if (this.activeArena != undefined && !this.paused) {
 				this.activeArena.keyPressed(code, this.mode);
 			}
 		}
@@ -179,7 +164,7 @@ class Client {
 	}
 
 	/* The server notifies me that the other player has lost. */
-	otherPlayerHasLost(data) {
+	adversaryLost(data) {
 		this.adversaryArena.setHighScore(data['high']);
 		this.adversaryMessageBox.changeText(MESSAGES['lost']);
 	}
@@ -198,8 +183,30 @@ class Client {
 		}
 	}
 
+	/* The player in the active arena wants to start again. */
+	startAgain() {
+		this.lost = false;
+		this.initializeActiveArena();
+		this.activeArena.setHighScore(this.highScore);
+
+		/* Change the messages. */
+		if (this.mode == 'solo') {
+			this.soloMessageBox.changeText('');
+		}
+		else if (this.mode == 'duo') {
+			this.activeMessageBox.changeText('');
+		}
+
+		/* In duo mode, send in the first pieces and notify the server. */
+		if (this.mode == 'duo') {
+			this.nextPieceGenerator.initialize();
+			this.nextPieceGenerator.sendFirstPieces(this.activeArena);
+			this.sendMessage('startedAgain', {'high': this.highScore});
+		}
+	}
+
 	/* The adversary has started again. */
-	startedAgain(data) {
+	adversaryStartAgain(data) {
 		this.initializeAdversaryArena();
 		this.nextPieceGenerator.sendFirstPieces(this.adversaryArena);
 		this.adversaryArena.setHighScore(data['high']);

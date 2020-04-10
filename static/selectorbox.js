@@ -1,6 +1,6 @@
 class SelectorBox extends ElementBox {
 	constructor(initialx, initialy, width, height, title, options) {
-		super(initialx, initialy, width, height, true);
+		super(initialx, initialy, width, height, true, true);
 
 		/* Create a text box for the title at the top. */
 		this.titleBox = new TextBox(initialx, initialy, width, height / (options.length + 1), title, true);
@@ -20,6 +20,14 @@ class SelectorBox extends ElementBox {
 		}
 
 		/* By default, always select the first option. */
+		this.tickBoxes[0].select();
+	}
+
+	/* Leaves the selector box as it was created. */
+	initialize() {
+		for (let tickBox of this.tickBoxes) {
+			tickBox.deselect();
+		}
 		this.tickBoxes[0].select();
 	}
 

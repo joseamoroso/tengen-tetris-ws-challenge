@@ -2,7 +2,7 @@
 class PieceBox extends ElementBox {
 	constructor(initialx, initialy, width, height) {
 		/* Call the superclass constructor. */
-		super(initialx, initialy, width, height, false);
+		super(initialx, initialy, width, height, false, false);
 
 		/* Calculate limits for the piece inside this box. */
 		let pieceWidth, pieceHeight;

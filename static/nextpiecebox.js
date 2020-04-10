@@ -1,7 +1,7 @@
 class NextPieceBox extends ElementBox {
 	constructor(initialx, initialy, width, height) {
 		/* Call the superclass constructor. */
-		super(initialx, initialy, width, height, true);
+		super(initialx, initialy, width, height, true, false);
 
 		/* A 'NEXT' text will occupy the top fourth of the space. */
 		this.nextTextBox = new TextBox(initialx, initialy, width, height / 4, 'NEXT', false);

@@ -1,7 +1,7 @@
 class StatBox extends ElementBox {
 	constructor(initialx, initialy, width, height) {
 		/* Call the superclass constructor. */
-		super(initialx, initialy, width, height, true);
+		super(initialx, initialy, width, height, true, false);
 
 		/* Create piece boxes for each of the pieces on the left sides,
 		numerical counters and text messages for the right side. */

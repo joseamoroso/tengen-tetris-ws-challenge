@@ -52,6 +52,15 @@ class Arena extends ElementBox {
 		let initialxBox = initialx + (width - boxWidth) / 2;
 		let initialyBox = initialy + (height - boxHeight) / 2;
 		this.levelSelectorBox = new SelectorBox(initialxBox, initialyBox, boxWidth, boxHeight, levelSelectorTitle, levelOptions);
+
+		/* Create the game over selector. */
+		let gameOverOptions = [TEXT_TRY_AGAIN, TEXT_SUBMIT_HIGH_SCORE];
+		let gameOverSelectorTitle = TEXT_GAME_OVER;
+		boxWidth = 3 * width / 4;
+		boxHeight = height / 4;
+		initialxBox = initialx + (width - boxWidth) / 2;
+		initialyBox = initialy + (height - boxHeight) / 2;
+		this.gameOverSelectorBox = new SelectorBox(initialxBox, initialyBox, boxWidth, boxHeight, gameOverSelectorTitle, gameOverOptions);
 	}
 
 	/* Update the elements in the arena. Function called in a loop. */
@@ -153,6 +162,20 @@ class Arena extends ElementBox {
 				this.downKeyPressed = true;
 			}
 		}
+		else if (this.state == STATE_GAME_OVER) {
+			if (code == UP_ARROW || code == DOWN_ARROW) {
+				this.gameOverSelectorBox.keyPressed(code);
+			}
+			else if (code == ENTER) {
+				let optionSelected = this.gameOverSelectorBox.getActiveTickBoxIndex();
+				if (optionSelected == 0) {
+					client.startAgain();
+				}
+				else if (optionSelected == 1) {
+					/* TODO: submit the high score to the server. */
+				}
+			}
+		}
 	}
 
 	/* Handles keys released from the keyboard. */
@@ -173,6 +196,8 @@ class Arena extends ElementBox {
 				}
 
 				client.playerHasLost();
+				this.gameOverSelectorBox.initialize();
+				this.state = STATE_GAME_OVER;
 				return true;
 			}
 		}
@@ -265,23 +290,25 @@ class Arena extends ElementBox {
 	display() {
 		super.display();
 
+		/* Display the boxes on the right panel. */
+		this.scoreBox.display();
+		this.levelLinesBox.display();
+		this.nextPieceBox.display();
+		this.statBox.display();
+
+		/* Display the falling piece. */
+		if (this.piece != undefined) {
+			this.piece.display(this.grid.initialx, this.grid.initialy, this.grid.squareSize);
+		}
+
+		/* Display the grid. */
+		this.grid.display();
+
 		if (this.state == STATE_SELECT_LEVEL) {
 			this.levelSelectorBox.display();
 		}
-		else if (this.state == STATE_PLAY) {
-			/* Display the boxes on the right panel. */
-			this.scoreBox.display();
-			this.levelLinesBox.display();
-			this.nextPieceBox.display();
-			this.statBox.display();
-
-			/* Display the falling piece. */
-			if (this.piece != undefined) {
-				this.piece.display(this.grid.initialx, this.grid.initialy, this.grid.squareSize);
-			}
-
-			/* Display the grid. */
-			this.grid.display();
+		if (this.state == STATE_GAME_OVER) {
+			this.gameOverSelectorBox.display();
 		}
 	}
 }

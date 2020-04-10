@@ -2,7 +2,7 @@
 class TextBox extends ElementBox {
 	constructor(initialx, initialy, width, height, initialText, border) {
 		/* Call the superclass constructor. */
-		super(initialx, initialy, width, height, border);
+		super(initialx, initialy, width, height, border, false);
 
 		/* Calculate the coordinates of the center of the box. */
 		this.centerx = this.initialx + this.width / 2;
