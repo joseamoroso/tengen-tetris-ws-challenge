@@ -89,13 +89,14 @@ function setup() {
 
 	/* The size of the canvas depends on the game mode. */
 	let canvasWidth = mode == 'solo' ? 400 : 800;
-	let canvas = createCanvas(canvasWidth, 600);
+	let canvasHeight = 540;
+	let canvas = createCanvas(canvasWidth, canvasHeight);
 
 	/* Move the canvas to the appropriate div element. */
 	canvas.parent('canvas-holder');
 
 	/* Create the client. */
-	client = new Client(canvasWidth, 600, mode=mode);
+	client = new Client(canvasWidth, canvasHeight, mode=mode);
 }
 
 function draw() {

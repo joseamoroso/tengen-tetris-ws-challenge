@@ -2,7 +2,7 @@
 class Arena extends ElementBox {
 	constructor(initialx, initialy, width, height, mirror) {
 		/* Call the superclass constructor. */
-		super(initialx, initialy, width, height, true);
+		super(initialx, initialy, width, height, true, COLOR_BLACK);
 
 		/* Decide dimensions and initial positions. */
 		let widthPanel = width - height / 2;
@@ -21,9 +21,9 @@ class Arena extends ElementBox {
 
 		/* Create the elements of the panel. */
 		let initialScoreBoxMessage = 'SCORE: 0\nHIGH: 0';
-		this.scoreBox = new TextBox(initialxPanel, initialy, widthPanel, height / 8, initialScoreBoxMessage, true);
+		this.scoreBox = new TextBox(initialxPanel, initialy, widthPanel, height / 8, initialScoreBoxMessage, true, COLOR_BLACK);
 		let initialLevelLinesBoxMessage = 'LEVEL: 0\nLINES: 0';
-		this.levelLinesBox = new TextBox(initialxPanel, initialy + height / 8, widthPanel, height / 8, initialLevelLinesBoxMessage, true);
+		this.levelLinesBox = new TextBox(initialxPanel, initialy + height / 8, widthPanel, height / 8, initialLevelLinesBoxMessage, true, COLOR_BLACK);
 		this.nextPieceBox = new NextPieceBox(initialxPanel, initialy + height / 4, widthPanel, height / 4);
 		this.statBox = new StatBox(initialxPanel, initialy + height / 2, widthPanel, height / 2);
 
@@ -44,23 +44,34 @@ class Arena extends ElementBox {
 		/* Establish the initial state of the arena. */
 		this.state = STATE_SELECT_LEVEL;
 
+		/* Create the centered boxes. */
+		let boxWidth, boxHeight, initialxBox, initialyBox;
+
 		/* Create the level selector box. */
 		let levelOptions = Array.from({length: 10}, (value, index) => index);
-		let levelSelectorTitle = 'SELECT LEVEL';
-		let boxWidth = width / 2;
-		let boxHeight = 3 * height / 4;
-		let initialxBox = initialx + (width - boxWidth) / 2;
-		let initialyBox = initialy + (height - boxHeight) / 2;
-		this.levelSelectorBox = new SelectorBox(initialxBox, initialyBox, boxWidth, boxHeight, levelSelectorTitle, levelOptions);
+		boxWidth = width / 2;
+		boxHeight = 3 * height / 4;
+		initialxBox = initialx + (width - boxWidth) / 2;
+		initialyBox = initialy + (height - boxHeight) / 2;
+		this.levelSelectorBox = new SelectorBox(initialxBox, initialyBox, boxWidth, boxHeight, TEXT_LEVEL_SELECTOR_TITLE, levelOptions);
 
 		/* Create the game over selector. */
-		let gameOverOptions = [TEXT_TRY_AGAIN, TEXT_SUBMIT_HIGH_SCORE];
-		let gameOverSelectorTitle = TEXT_GAME_OVER;
+		let gameOverOptions = [TEXT_TRY_AGAIN, TEXT_SUBMIT_AND_TRY_AGAIN];
 		boxWidth = 3 * width / 4;
 		boxHeight = height / 4;
 		initialxBox = initialx + (width - boxWidth) / 2;
 		initialyBox = initialy + (height - boxHeight) / 2;
-		this.gameOverSelectorBox = new SelectorBox(initialxBox, initialyBox, boxWidth, boxHeight, gameOverSelectorTitle, gameOverOptions);
+		this.gameOverSelectorBox = new SelectorBox(initialxBox, initialyBox, boxWidth, boxHeight, TEXT_GAME_OVER, gameOverOptions);
+
+		/* Create the high score submit box. */
+		this.submitBox = new InputBox(initialxBox, initialyBox, boxWidth, boxHeight, TEXT_SUBMIT);
+
+		/* Create the paused message box. */
+		boxWidth = width / 2;
+		boxHeight = height / 6;
+		initialxBox = initialx + (width - boxWidth) / 2;
+		initialyBox = initialy + (height - boxHeight) / 2;
+		this.pausedBox = new TextBox(initialxBox, initialyBox, boxWidth, boxHeight, TEXT_PAUSED, true, COLOR_GREY);
 	}
 
 	/* Update the elements in the arena. Function called in a loop. */
@@ -131,7 +142,7 @@ class Arena extends ElementBox {
 	}
 
 	/* Handles keys pressed on the keyboard. */
-	keyPressed(code, mode) {
+	keyPressed(code, key, mode) {
 		if (this.state == STATE_SELECT_LEVEL) {
 			if (code == UP_ARROW || code == DOWN_ARROW) {
 				this.levelSelectorBox.keyPressed(code);
@@ -169,11 +180,23 @@ class Arena extends ElementBox {
 			else if (code == ENTER) {
 				let optionSelected = this.gameOverSelectorBox.getActiveTickBoxIndex();
 				if (optionSelected == 0) {
+					/* Start over the game. */
 					client.startAgain();
 				}
 				else if (optionSelected == 1) {
-					/* TODO: submit the high score to the server. */
+					/* Ask the user to input their username. */
+					this.state = STATE_SUBMIT;
 				}
+			}
+		}
+		else if (this.state == STATE_SUBMIT) {
+			if (code == ENTER) {
+				let username = this.submitBox.getInput();
+				client.sendMessage('submit', {'username': username, 'high': this.high});
+				client.startAgain();
+			}
+			else {
+				this.submitBox.keyPressed(key, code);
 			}
 		}
 	}
@@ -305,10 +328,21 @@ class Arena extends ElementBox {
 		this.grid.display();
 
 		if (this.state == STATE_SELECT_LEVEL) {
+			this.blurBackground();
 			this.levelSelectorBox.display();
 		}
-		if (this.state == STATE_GAME_OVER) {
+		else if (this.state == STATE_GAME_OVER) {
+			this.blurBackground();
 			this.gameOverSelectorBox.display();
 		}
+		else if (this.state == STATE_SUBMIT) {
+			this.blurBackground();
+			this.submitBox.display();
+		}
+	}
+
+	blurBackground() {
+		fill(0, 180);
+		rect(this.initialx, this.initialy, this.width, this.height);
 	}
 }

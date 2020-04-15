@@ -1,7 +1,7 @@
 class StatBox extends ElementBox {
 	constructor(initialx, initialy, width, height) {
 		/* Call the superclass constructor. */
-		super(initialx, initialy, width, height, true, false);
+		super(initialx, initialy, width, height, true, COLOR_BLACK);
 
 		/* Create piece boxes for each of the pieces on the left sides,
 		numerical counters and text messages for the right side. */
@@ -12,7 +12,7 @@ class StatBox extends ElementBox {
 			this.pieceBoxes[PIECES[i]] = new PieceBox(initialx, initialy + i * height / 7, width / 2, height / 7);
 			this.pieceBoxes[PIECES[i]].updatePiece(new Piece(PIECES[i]));
 			this.countNumbers[PIECES[i]] = 0;
-			this.countTextBoxes[PIECES[i]] = new TextBox(initialx + width / 2, initialy + i * height / 7, width / 2, height / 7, '0', false);
+			this.countTextBoxes[PIECES[i]] = new TextBox(initialx + width / 2, initialy + i * height / 7, width / 2, height / 7, '0', false, COLOR_BLACK);
 		}
 	}
 

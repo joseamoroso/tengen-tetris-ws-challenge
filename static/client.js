@@ -1,9 +1,9 @@
 /* Define the directions of movement of the pieces. */
-const DIR_DOWN = 'down'
-const DIR_RIGHT = 'right'
-const DIR_LEFT = 'left'
+const DIR_DOWN = 'down';
+const DIR_RIGHT = 'right';
+const DIR_LEFT = 'left';
 
-/* Scoring system (at level zero) */
+/* Scoring system at level zero. */
 const POINTS = {
 	1: 40,
 	2: 100,
@@ -11,24 +11,26 @@ const POINTS = {
 	4: 1200
 };
 
-const DEFAULT_TEXT_SIZE = 16;
-const DEFAULT_BORDER_STROKE_WEIGHT = 3;
+const TEXT_SIZE = 16;
+const BORDER_STROKE_WEIGHT = 3;
 const TICK_DIAMETER = 10;
+const COLOR_WHITE = 255;
+const COLOR_GREY = 40;
+const COLOR_BLACK = 0;
 
 const TEXT_TRY_AGAIN = 'TRY AGAIN';
-const TEXT_SUBMIT_HIGH_SCORE = 'SUBMIT HIGH';
+const TEXT_SUBMIT_AND_TRY_AGAIN = 'SUBMIT AND TRY AGAIN';
 const TEXT_GAME_OVER = 'GAME OVER';
+const TEXT_SUBMIT = 'INPUT USERNAME';
+const TEXT_PAUSED = 'PAUSED';
+const TEXT_LEVEL_SELECTOR_TITLE = 'SELECT LEVEL';
 
 const PIECES = ['T', 'J', 'Z', 'O', 'S', 'L', 'I'];
-
-const MESSAGES = {
-	'paused': 'PAUSED',
-	'lost': 'GAME OVER'
-};
 
 const STATE_SELECT_LEVEL = 'selectLevel';
 const STATE_PLAY = 'play';
 const STATE_GAME_OVER = 'gameOver';
+const STATE_SUBMIT = 'submit';
 
 /* This class controls the highest level logic of the game. */
 class Client {
@@ -42,17 +44,10 @@ class Client {
 		this.activeArena = undefined;
 		this.adversaryArena = undefined;
 
-		/* Create the text boxes at the top. */
-		if (mode == 'solo') {
-			this.soloMessageBox = new TextBox(0, 0, canvasWidth, canvasHeight / 10, '', true);
-		}
-		else if (mode == 'duo') {
-			let duoBoxWidth = canvasWidth - 9 * canvasHeight / 10;
-			let messageBoxesWidth = (canvasWidth - duoBoxWidth) / 2;
-			this.activeMessageBox = new TextBox(0, 0, messageBoxesWidth, canvasHeight / 10, '', true);
-			this.adversaryMessageBox = new TextBox(messageBoxesWidth + duoBoxWidth, 0, messageBoxesWidth, canvasHeight / 10, '', true);
-			this.duoMessageBox = new TextBox(messageBoxesWidth, 0, duoBoxWidth, canvasHeight / 10, MESSAGES['paused'], true);
-		}
+		/* Create the paused text box in the center. */
+		let boxWidth = 100;
+		let boxHeight = canvasHeight / 10;
+		this.pausedBox = new TextBox((canvasWidth - boxWidth) / 2, (canvasHeight - boxHeight) / 2, boxWidth, boxHeight, TEXT_PAUSED, true, COLOR_GREY);
 
 		/* Create a next piece generator. */
 		this.nextPieceGenerator = new NextPieceGenerator(mode);
@@ -68,16 +63,16 @@ class Client {
 	/* Gives a new value for the active arena. */
 	initializeActiveArena() {
 		if (this.mode == 'solo') {
-			this.activeArena = new Arena(0, this.canvasHeight / 10, this.canvasWidth, 9 * this.canvasHeight / 10, false);
+			this.activeArena = new Arena(0, 0, this.canvasWidth, this.canvasHeight, false);
 		}
 		else if (this.mode == 'duo') {
-			this.activeArena = new Arena(0, this.canvasHeight / 10, this.canvasWidth / 2, 9 * this.canvasHeight / 10, false);
+			this.activeArena = new Arena(0, 0, this.canvasWidth / 2, this.canvasHeight, false);
 		}
 	}
 
 	/* Gives a new value for the adversary arena. */
 	initializeAdversaryArena() {
-		this.adversaryArena = new Arena(this.canvasWidth / 2, this.canvasHeight / 10, this.canvasWidth / 2, 9 * this.canvasHeight / 10, true);
+		this.adversaryArena = new Arena(this.canvasWidth / 2, 0, this.canvasWidth / 2, this.canvasHeight, true);
 	}
 
 	/* In duo mode, begin the game when the server has found two players. */
@@ -105,7 +100,7 @@ class Client {
 		this.adversaryArena.receiveServerUpdate(data);
 	}
 
-	/* The server has sent the next batch to the active arena. */
+	/* The server has sent the next batch of pieces. */
 	receiveNextBatch(data) {
 		this.nextPieceGenerator.receiveBatch(data);
 	}
@@ -130,7 +125,7 @@ class Client {
 		else {
 			/* For any other key, send the key to the active arena. */
 			if (this.activeArena != undefined && !this.paused) {
-				this.activeArena.keyPressed(code, this.mode);
+				this.activeArena.keyPressed(code, key, this.mode);
 			}
 		}
 	}
@@ -153,12 +148,7 @@ class Client {
 		this.lost = true;
 		this.highScore = this.activeArena.getHighScore();
 
-		/* Change the message and notify the other client if needed. */
-		if (this.mode == 'solo') {
-			this.soloMessageBox.changeText(MESSAGES['lost']);
-		}
-		else if (this.mode == 'duo') {
-			this.activeMessageBox.changeText(MESSAGES['lost']);
+		if (this.mode == 'duo') {
 			this.sendMessage('lost', {'high': this.highScore});
 		}
 	}
@@ -166,21 +156,11 @@ class Client {
 	/* The server notifies me that the other player has lost. */
 	adversaryLost(data) {
 		this.adversaryArena.setHighScore(data['high']);
-		this.adversaryMessageBox.changeText(MESSAGES['lost']);
 	}
 
 	/* Toggle the paused state (this event can be sent by the server or performed by the player). */
 	togglePause() {
 		this.paused = this.paused ? false : true;
-
-		/* Change the message. */
-		let message = this.paused ? MESSAGES['paused'] : '';
-		if (this.mode == 'solo') {
-			this.soloMessageBox.changeText(message);
-		}
-		else if (this.mode == 'duo') {
-			this.duoMessageBox.changeText(message);
-		}
 	}
 
 	/* The player in the active arena wants to start again. */
@@ -188,14 +168,6 @@ class Client {
 		this.lost = false;
 		this.initializeActiveArena();
 		this.activeArena.setHighScore(this.highScore);
-
-		/* Change the messages. */
-		if (this.mode == 'solo') {
-			this.soloMessageBox.changeText('');
-		}
-		else if (this.mode == 'duo') {
-			this.activeMessageBox.changeText('');
-		}
 
 		/* In duo mode, send in the first pieces and notify the server. */
 		if (this.mode == 'duo') {
@@ -210,7 +182,6 @@ class Client {
 		this.initializeAdversaryArena();
 		this.nextPieceGenerator.sendFirstPieces(this.adversaryArena);
 		this.adversaryArena.setHighScore(data['high']);
-		this.adversaryMessageBox.changeText('');
 	}
 
 	/* The arena asks for the next piece. */
@@ -245,14 +216,13 @@ class Client {
 			this.adversaryArena.display();
 		}
 
-		/* Display the message boxes. */
-		if (this.mode == 'solo') {
-			this.soloMessageBox.display();
-		}
-		else if (this.mode == 'duo') {
-			this.duoMessageBox.display();
-			this.activeMessageBox.display();
-			this.adversaryMessageBox.display();
+		/* Display the pause box if needed. */
+		if (this.paused) {
+			this.activeArena.blurBackground();
+			if (this.mode == 'duo') {
+				this.adversaryArena.blurBackground();
+			}
+			this.pausedBox.display();
 		}
 	}
 }

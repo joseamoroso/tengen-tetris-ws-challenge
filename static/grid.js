@@ -3,7 +3,7 @@ are stored. */
 class Grid extends ElementBox {
 	constructor(initialx, initialy, width, height) {
 		/* Call the superclass constructor. */
-		super(initialx, initialy, width, height, true);
+		super(initialx, initialy, width, height, true, COLOR_BLACK);
 
 		/* Calculate the size of one square in pixels. */
 		this.squareSize = this.width / 10;

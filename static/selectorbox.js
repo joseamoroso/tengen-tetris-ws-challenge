@@ -1,9 +1,9 @@
 class SelectorBox extends ElementBox {
 	constructor(initialx, initialy, width, height, title, options) {
-		super(initialx, initialy, width, height, true, true);
+		super(initialx, initialy, width, height, true, COLOR_GREY);
 
 		/* Create a text box for the title at the top. */
-		this.titleBox = new TextBox(initialx, initialy, width, height / (options.length + 1), title, true);
+		this.titleBox = new TextBox(initialx, initialy, width, height / (options.length + 1), title, true, COLOR_BLACK);
 
 		/* Decide on some dimensions. */
 		let elementHeight = height / (options.length + 1);
@@ -16,7 +16,7 @@ class SelectorBox extends ElementBox {
 		this.textBoxes = [];
 		for (let i = 0; i < options.length; i++) {
 			this.tickBoxes.push(new TickBox(initialx, initialyOptions + i * elementHeight, width / 4, elementHeight));
-			this.textBoxes.push(new TextBox(initialxTextBox, initialyOptions + i * elementHeight, widthTextBox, elementHeight, options[i], false));
+			this.textBoxes.push(new TextBox(initialxTextBox, initialyOptions + i * elementHeight, widthTextBox, elementHeight, options[i], false, COLOR_BLACK));
 		}
 
 		/* By default, always select the first option. */

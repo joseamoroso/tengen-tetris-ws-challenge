@@ -1,4 +1,4 @@
-/* Basic box that acts as a container and may display a border. */
+/* Basic box that acts as a container and can have a border and a fill color. */
 class ElementBox {
 	constructor(initialx, initialy, width, height, border, fill) {
 		this.initialx = initialx;
@@ -11,15 +11,16 @@ class ElementBox {
 
 	display() {
 		/* Fill the background if requested. */
-		if (this.fill) {
+		if (this.fill != COLOR_BLACK) {
 			noStroke();
-			fill(40);
+			fill(this.fill);
 			rect(this.initialx, this.initialy, this.width, this.height);
 		}
+
 		/* Display a border around the box if requested. */
 		if (this.border) {
-			stroke(255);
-			strokeWeight(DEFAULT_BORDER_STROKE_WEIGHT);
+			stroke(COLOR_WHITE);
+			strokeWeight(BORDER_STROKE_WEIGHT);
 			line(this.initialx, this.initialy, this.initialx + this.width, this.initialy);
 			line(this.initialx + this.width, this.initialy, this.initialx + this.width, this.initialy + this.height);
 			line(this.initialx + this.width, this.initialy + this.height, this.initialx, this.initialy + this.height);
