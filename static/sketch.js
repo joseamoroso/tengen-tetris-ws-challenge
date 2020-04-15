@@ -80,6 +80,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		console.log('Received message: started again');
 		client.adversaryStartAgain(data);
 	});
+
+	/* The adversary updates the selection of one of its selectors. */
+	socket.on('updateSelector', data => {
+		console.log('Received message: update selector');
+		client.updateSelector(data);
+	});
+
+	/* The adversary updates its state. */
+	socket.on('updateState', data => {
+		console.log('Received message: update state');
+		client.updateState(data);
+	});
 });
 
 function setup() {

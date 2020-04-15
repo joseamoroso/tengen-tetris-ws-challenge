@@ -55,6 +55,11 @@ class Arena extends ElementBox {
 		initialyBox = initialy + (height - boxHeight) / 2;
 		this.levelSelectorBox = new SelectorBox(initialxBox, initialyBox, boxWidth, boxHeight, TEXT_LEVEL_SELECTOR_TITLE, levelOptions);
 
+		/* Create the wait adversary selection box. */
+		boxHeight = height / 7;
+		initialyBox = initialy + (height - boxHeight) / 2;
+		this.waitAdversarySelectionBox = new TextBox(initialxBox, initialyBox, boxWidth, boxHeight, TEXT_WAIT_SELECTION, true, COLOR_GREY);
+
 		/* Create the game over selector. */
 		let gameOverOptions = [TEXT_TRY_AGAIN, TEXT_SUBMIT_AND_TRY_AGAIN];
 		boxWidth = 3 * width / 4;
@@ -65,13 +70,6 @@ class Arena extends ElementBox {
 
 		/* Create the high score submit box. */
 		this.submitBox = new InputBox(initialxBox, initialyBox, boxWidth, boxHeight, TEXT_SUBMIT);
-
-		/* Create the paused message box. */
-		boxWidth = width / 2;
-		boxHeight = height / 6;
-		initialxBox = initialx + (width - boxWidth) / 2;
-		initialyBox = initialy + (height - boxHeight) / 2;
-		this.pausedBox = new TextBox(initialxBox, initialyBox, boxWidth, boxHeight, TEXT_PAUSED, true, COLOR_GREY);
 	}
 
 	/* Update the elements in the arena. Function called in a loop. */
@@ -83,7 +81,7 @@ class Arena extends ElementBox {
 				this.nextPieceBox.updatePiece(this.nextPiece);
 
 				/* Only in duo mode, send an update of the current arena. */
-				if (mode == 'duo') {
+				if (mode == MODE_DUO) {
 					client.sendMessage('updateArena', this.packServerUpdate());
 				}
 			}
@@ -100,13 +98,13 @@ class Arena extends ElementBox {
 			/* If the down key is pressed, directly try to move the piece. */
 			if (this.downKeyPressed) {
 				if (this.stopwatch.getElapsedTime() > 25) {
-					if (this.movePieceDown() && mode == 'duo') {
+					if (this.movePieceDown() && mode == MODE_DUO) {
 						client.sendMessage('updatePiece', this.packPiece());
 					}
 				}
 			}
 			else if (this.stopwatch.getElapsedTime() > 400) {
-				if (this.movePieceDown() && mode == 'duo') {
+				if (this.movePieceDown() && mode == MODE_DUO) {
 					client.sendMessage('updatePiece', this.packPiece());
 				}
 			}
@@ -123,8 +121,8 @@ class Arena extends ElementBox {
 
 			/* Get the score of the current drop to the grid. */
 			let result = this.grid.assignScoresAndClean();
-			this.score += result['score'];
-			this.lines += result['lines'];
+			this.score += result.score;
+			this.lines += result.lines;
 			this.checkLevel();
 
 			/* Update the necessary boxes. */
@@ -145,27 +143,27 @@ class Arena extends ElementBox {
 	keyPressed(code, key, mode) {
 		if (this.state == STATE_SELECT_LEVEL) {
 			if (code == UP_ARROW || code == DOWN_ARROW) {
-				this.levelSelectorBox.keyPressed(code);
+				this.levelSelectorBox.keyPressed(code, mode);
 			}
 			else if (code == ENTER) {
 				this.level = this.levelSelectorBox.getActiveTickBoxIndex();
 				this.updateLevelLinesBox();
-				this.state = STATE_PLAY;
+				client.playerSelectedInitialLevel(this.level);
 			}
 		}
 		else if (this.state == STATE_PLAY) {
 			if (code == LEFT_ARROW) {
-				if (this.piece.move(DIR_LEFT, this.grid) && mode == 'duo') {
+				if (this.piece.move(DIR_LEFT, this.grid) && mode == MODE_DUO) {
 					client.sendMessage('updatePiece', this.packPiece());
 				}
 			}
 			else if (code == RIGHT_ARROW) {
-				if (this.piece.move(DIR_RIGHT, this.grid) && mode == 'duo') {
+				if (this.piece.move(DIR_RIGHT, this.grid) && mode == MODE_DUO) {
 					client.sendMessage('updatePiece', this.packPiece());
 				}
 			}
 			else if (code == UP_ARROW) {
-				if (this.piece.rotate(this.grid) && mode == 'duo') {
+				if (this.piece.rotate(this.grid) && mode == MODE_DUO) {
 					client.sendMessage('updatePiece', this.packPiece());
 				}
 			}
@@ -175,16 +173,14 @@ class Arena extends ElementBox {
 		}
 		else if (this.state == STATE_GAME_OVER) {
 			if (code == UP_ARROW || code == DOWN_ARROW) {
-				this.gameOverSelectorBox.keyPressed(code);
+				this.gameOverSelectorBox.keyPressed(code, mode);
 			}
 			else if (code == ENTER) {
 				let optionSelected = this.gameOverSelectorBox.getActiveTickBoxIndex();
 				if (optionSelected == 0) {
-					/* Start over the game. */
 					client.startAgain();
 				}
 				else if (optionSelected == 1) {
-					/* Ask the user to input their username. */
 					this.state = STATE_SUBMIT;
 				}
 			}
@@ -192,7 +188,7 @@ class Arena extends ElementBox {
 		else if (this.state == STATE_SUBMIT) {
 			if (code == ENTER) {
 				let username = this.submitBox.getInput();
-				client.sendMessage('submit', {'username': username, 'high': this.high});
+				client.sendMessage('submit', {username: username, high: this.high});
 				client.startAgain();
 			}
 			else {
@@ -218,7 +214,7 @@ class Arena extends ElementBox {
 					this.updateScoreBox();
 				}
 
-				client.playerHasLost();
+				client.playerLost(this.high);
 				this.gameOverSelectorBox.initialize();
 				this.state = STATE_GAME_OVER;
 				return true;
@@ -254,11 +250,24 @@ class Arena extends ElementBox {
 		this.updateScoreBox();
 	}
 
+	getLevel() {
+		return this.level;
+	}
+
+	setLevel(level) {
+		this.level = level;
+		this.updateLevelLinesBox();
+	}
+
+	setState(state) {
+		this.state = state;
+	}
+
 	/* This arena receives the first two pieces. */
 	receiveFirstPieces(data) {
-		this.nextPiece = new Piece(data['nextPiece']);
+		this.nextPiece = new Piece(data.nextPiece);
 		this.nextPieceBox.updatePiece(this.nextPiece);
-		this.piece = new Piece(data['piece']);
+		this.piece = new Piece(data.piece);
 		this.statBox.updateCounts(this.piece.type);
 		this.stopwatch.start();
 	}
@@ -266,36 +275,36 @@ class Arena extends ElementBox {
 	/* Packs the arena's information to be sent to the server. */
 	packServerUpdate() {
 		return {
-			'score': this.score,
-			'high': this.high,
-			'level': this.level,
-			'lines': this.lines,
-			'grid': this.grid.packServerUpdate(),
-			'stats': this.statBox.packServerUpdate(),
-			'piece': this.piece.packServerUpdate(),
-			'nextPiece': this.nextPiece.type
+			score: this.score,
+			high: this.high,
+			level: this.level,
+			lines: this.lines,
+			grid: this.grid.packServerUpdate(),
+			stats: this.statBox.packServerUpdate(),
+			piece: this.piece.packServerUpdate(),
+			nextPiece: this.nextPiece.type
 		}
 	}
 
 	/* The server has sent an update on the adversary's arena. */
 	receiveServerUpdate(data) {
 		/* Keep a copy of the numerical values. */
-		this.score = data['score'];
-		this.high = data['high'];
-		this.level = data['level'];
-		this.lines = data['lines'];
+		this.score = data.score;
+		this.high = data.high;
+		this.level = data.level;
+		this.lines = data.lines;
 
 		/* Upate the text boxes. */
 		this.updateLevelLinesBox();
 		this.updateScoreBox();
 
 		/* Update the grid and the statistics. */
-		this.grid.receiveServerUpdate(data['grid']);
-		this.statBox.receiveServerUpdate(data['stats']);
+		this.grid.receiveServerUpdate(data.grid);
+		this.statBox.receiveServerUpdate(data.stats);
 
 		/* Update the piece and the next piece. */
-		this.piece.receiveServerUpdate(data['piece']);
-		this.nextPiece = new Piece(data['nextPiece']);
+		this.piece.receiveServerUpdate(data.piece);
+		this.nextPiece = new Piece(data.nextPiece);
 		this.nextPieceBox.updatePiece(this.nextPiece);
 	}
 
@@ -307,6 +316,15 @@ class Arena extends ElementBox {
 	/* Receives a piece update from the server. */
 	receivePiece(data) {
 		this.piece.receiveServerUpdate(data);
+	}
+
+	updateSelector(data) {
+		if (this.state == STATE_SELECT_LEVEL) {
+			this.levelSelectorBox.setActiveTickBoxIndex(data.selection);
+		}
+		else if (this.state == STATE_GAME_OVER) {
+			this.gameOverSelectorBox.setActiveTickBoxIndex(data.selection);
+		}
 	}
 
 	/* Displays all the elements in the arena. */
@@ -331,6 +349,10 @@ class Arena extends ElementBox {
 			this.blurBackground();
 			this.levelSelectorBox.display();
 		}
+		else if (this.state == STATE_WAIT_ADVERSARY_SELECTION) {
+			this.blurBackground();
+			this.waitAdversarySelectionBox.display();
+		}
 		else if (this.state == STATE_GAME_OVER) {
 			this.blurBackground();
 			this.gameOverSelectorBox.display();
@@ -343,6 +365,7 @@ class Arena extends ElementBox {
 
 	blurBackground() {
 		fill(0, 180);
+		noStroke();
 		rect(this.initialx, this.initialy, this.width, this.height);
 	}
 }

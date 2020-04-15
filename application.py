@@ -69,7 +69,19 @@ def lost(data):
 @socketio.on('startedAgain')
 def startedAgain(data):
 	master.logMessage('startedAgain', request.sid)
-	return master.startedAgain(request.sid, data)
+	return master.startedAgain(request.sid)
+
+# A player updates the selection of a selector box.
+@socketio.on('updateSelector')
+def updateSelector(data):
+	master.logMessage('updateSelector', request.sid)
+	return master.updateSelector(request.sid, data)
+
+# A player updates the state.
+@socketio.on('updateState')
+def updateState(data):
+	master.logMessage('updateState', request.sid)
+	return master.updateState(request.sid, data)
 
 # Run the app with web sockets capabilities.
 if __name__ == '__main__':

@@ -88,11 +88,19 @@ class Master:
 		return self.bounce(socketId, 'lost', data)
 
 	# A player in duo mode has decided to start again.
-	def startedAgain(self, socketId, data):
+	def startedAgain(self, socketId):
 		# Find the room of the player.
 		room = self.getRoom(socketId)
 		if room == None:
 			return False
 
 		# Call the function of the appropriate room.
-		return room.startedAgain(socketId, data)
+		return room.startedAgain(socketId)
+
+	# A player updates the selection of a selector box.
+	def updateSelector(self, socketId, data):
+		return self.bounce(socketId, 'updateSelector', data)
+
+	# A player updates the state.
+	def updateState(self, socketId, data):
+		return self.bounce(socketId, 'updateState', data)

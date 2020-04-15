@@ -31,12 +31,19 @@ class SelectorBox extends ElementBox {
 		this.tickBoxes[0].select();
 	}
 
-	keyPressed(code) {
+	/* Updates the selection. */
+	keyPressed(code, mode) {
+		let changed = false;
 		if (code == UP_ARROW) {
-			this.moveSelectionUp();
+			changed = this.moveSelectionUp();
 		}
 		else if (code == DOWN_ARROW) {
-			this.moveSelectionDown();
+			changed = this.moveSelectionDown();
+		}
+
+		/* If there has been a change and mode is duo, send a message to the server */
+		if (changed && mode == MODE_DUO) {
+			client.sendMessage('updateSelector', {selection: this.getActiveTickBoxIndex()});
 		}
 	}
 
@@ -49,6 +56,12 @@ class SelectorBox extends ElementBox {
 		}
 
 		return undefined;
+	}
+
+	setActiveTickBoxIndex(index) {
+		this.initialize();
+		this.tickBoxes[0].deselect();
+		this.tickBoxes[index].select();
 	}
 
 	/* Selects the tick box above the one currently selected. */
