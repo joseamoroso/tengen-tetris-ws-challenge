@@ -8,14 +8,14 @@ class SelectorBox extends ElementBox {
 		/* Decide on some dimensions. */
 		let elementHeight = height / (options.length + 1);
 		let initialyOptions = initialy + elementHeight;
-		let initialxTextBox = initialx + width / 4;
 		let widthTextBox = 3 * width / 4;
+		let initialxTextBox = initialx + (width - widthTextBox) / 2;
 
 		/* Create a set of small tick boxes on the left and text boxes on the right. */
 		this.tickBoxes = [];
 		this.textBoxes = [];
 		for (let i = 0; i < options.length; i++) {
-			this.tickBoxes.push(new TickBox(initialx, initialyOptions + i * elementHeight, width / 4, elementHeight));
+			this.tickBoxes.push(new TickBox(initialx, initialyOptions + i * elementHeight, width, elementHeight));
 			this.textBoxes.push(new TextBox(initialxTextBox, initialyOptions + i * elementHeight, widthTextBox, elementHeight, options[i], false, COLOR_BLACK));
 		}
 

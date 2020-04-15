@@ -1,8 +1,15 @@
 class TickBox {
 	constructor(initialx, initialy, width, height) {
-		/* Calculate the center of the ellipse. */
-		this.centerx = initialx + width / 2;
-		this.centery = initialy + height / 2;
+		/* Calculate the center of the ellipses. */
+		this.centers = {};
+		this.centers.left = {
+			x: initialx + width / 16,
+			y: initialy + height / 2
+		};
+		this.centers.right = {
+			x: initialx + width - width / 16,
+			y: initialy + height / 2
+		};
 
 		/* All tick boxes start deselected by default. */
 		this.selected = false;
@@ -26,7 +33,9 @@ class TickBox {
 			ellipseMode(CENTER);
 			fill(0, 255, 0);
 			noStroke();
-			ellipse(this.centerx, this.centery, TICK_DIAMETER, TICK_DIAMETER);
+			for (let situation in this.centers) {
+				ellipse(this.centers[situation].x, this.centers[situation].y, TICK_DIAMETER, TICK_DIAMETER);
+			}
 		}
 	}
 }

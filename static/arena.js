@@ -49,14 +49,16 @@ class Arena extends ElementBox {
 
 		/* Create the level selector box. */
 		let levelOptions = Array.from({length: 10}, (value, index) => index);
-		boxWidth = width / 2;
+		boxWidth = width / 3;
 		boxHeight = 3 * height / 4;
 		initialxBox = initialx + (width - boxWidth) / 2;
 		initialyBox = initialy + (height - boxHeight) / 2;
 		this.levelSelectorBox = new SelectorBox(initialxBox, initialyBox, boxWidth, boxHeight, TEXT_LEVEL_SELECTOR_TITLE, levelOptions);
 
 		/* Create the wait adversary selection box. */
+		boxWidth = width / 2;
 		boxHeight = height / 7;
+		initialxBox = initialx + (width - boxWidth) / 2;
 		initialyBox = initialy + (height - boxHeight) / 2;
 		this.waitAdversarySelectionBox = new TextBox(initialxBox, initialyBox, boxWidth, boxHeight, TEXT_WAIT_SELECTION, true, COLOR_GREY);
 

@@ -19,7 +19,7 @@ const PIECES = ['T', 'J', 'Z', 'O', 'S', 'L', 'I'];
 
 const TEXT_SIZE = 16;
 const BORDER_STROKE_WEIGHT = 3;
-const TICK_DIAMETER = 10;
+const TICK_DIAMETER = 8;
 const COLOR_WHITE = 255;
 const COLOR_GREY = 40;
 const COLOR_BLACK = 0;
