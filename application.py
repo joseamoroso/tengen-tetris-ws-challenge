@@ -83,6 +83,12 @@ def updateState(data):
 	master.logMessage('updateState', request.sid)
 	return master.updateState(request.sid, data)
 
+# A player updates their input box.
+@socketio.on('updateInputBox')
+def updateInputBox(data):
+	master.logMessage('updateInputBox', request.sid)
+	return master.updateInputBox(request.sid, data)
+
 # Run the app with web sockets capabilities.
 if __name__ == '__main__':
 	app.debug = True

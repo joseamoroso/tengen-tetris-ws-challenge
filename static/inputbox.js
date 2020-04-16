@@ -9,17 +9,31 @@ class InputBox extends ElementBox {
 		this.textBox = new TextBox(initialx, initialy + height / 2, width, height / 2, '', true, COLOR_BLACK);
 	}
 
-	keyPressed(key, code) {
+	keyPressed(key, code, mode) {
 		/* If backspace, remove the last letter. */
 		if (code == BACKSPACE) {
 			let currentText = this.textBox.getText();
 			this.textBox.changeText(currentText.substring(0, currentText.length - 1));
+
+			/* Notify the server if in duo mode. */
+			if (mode == MODE_DUO) {
+				this.sendServerUpdate();
+			}
 		}
 
 		/* Add the letter only if it is lowercase. */
 		else if (key.match(/^[a-z0-9]+$/)) {
 			this.textBox.changeText(this.textBox.getText() + key);
+
+			/* Notify the server if in duo mode. */
+			if (mode == MODE_DUO) {
+				this.sendServerUpdate();
+			}
 		}
+	}
+
+	sendServerUpdate() {
+		client.sendMessage('updateInputBox', {text: this.textBox.getText()});
 	}
 
 	/* Leaves the input clean. */
@@ -30,6 +44,10 @@ class InputBox extends ElementBox {
 	/* Returns the currently stored input text. */
 	getInput() {
 		return this.textBox.getText();
+	}
+
+	setInput(text) {
+		this.textBox.changeText(text);
 	}
 
 	display() {

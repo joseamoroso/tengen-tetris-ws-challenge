@@ -184,6 +184,7 @@ class Arena extends ElementBox {
 				}
 				else if (optionSelected == 1) {
 					this.state = STATE_SUBMIT;
+					client.sendMessage('updateState', {state: STATE_SUBMIT});
 				}
 			}
 		}
@@ -194,7 +195,7 @@ class Arena extends ElementBox {
 				client.startAgain();
 			}
 			else {
-				this.submitBox.keyPressed(key, code);
+				this.submitBox.keyPressed(key, code, mode);
 			}
 		}
 	}
@@ -327,6 +328,10 @@ class Arena extends ElementBox {
 		else if (this.state == STATE_GAME_OVER) {
 			this.gameOverSelectorBox.setActiveTickBoxIndex(data.selection);
 		}
+	}
+
+	updateInputBox(text) {
+		this.submitBox.setInput(text);
 	}
 
 	/* Displays all the elements in the arena. */

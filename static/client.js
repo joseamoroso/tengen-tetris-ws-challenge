@@ -232,6 +232,7 @@ class Client {
 		/* Keep a copy of the state. */
 		this.adversaryArena.setState(data.state);
 
+		/* Additional logic for some of the state changes. */
 		if (data.state == STATE_PLAY || data.state == STATE_WAIT_ADVERSARY_SELECTION) {
 			/* Keep a copy of the level and update adversary arena. */
 			this.arenaInfo.adversary.initialLevelSelected = data.level;
@@ -247,6 +248,13 @@ class Client {
 	/* The adversary has updated their selection in a selector box. */
 	updateSelector(data) {
 		this.adversaryArena.updateSelector(data);
+	}
+
+	/* The adversary sends the new content of their input box. */
+	updateInputBox(data) {
+		if (this.mode == MODE_DUO && this.adversaryArena.state == STATE_SUBMIT) {
+			this.adversaryArena.updateInputBox(data.text);
+		}
 	}
 
 	/* The arena asks for the next piece. */

@@ -104,3 +104,7 @@ class Master:
 	# A player updates the state.
 	def updateState(self, socketId, data):
 		return self.bounce(socketId, 'updateState', data)
+
+	# A player updates their input box.
+	def updateInputBox(self, socketId, data):
+		return self.bounce(socketId, 'updateInputBox', data)

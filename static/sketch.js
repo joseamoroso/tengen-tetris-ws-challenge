@@ -92,6 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		console.log('Received message: update state');
 		client.updateState(data);
 	});
+
+	/* The adversary updates the content of an input box. */
+	socket.on('updateInputBox', data => {
+		console.log('Received message: update input box');
+		client.updateInputBox(data);
+	});
 });
 
 function setup() {
