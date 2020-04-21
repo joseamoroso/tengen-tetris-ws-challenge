@@ -1,6 +1,7 @@
 from flask_socketio import emit
 
 from room import Room
+from database import Database
 
 class Master:
 	roomsNumber = 2
@@ -11,6 +12,10 @@ class Master:
 		for i in range(self.roomsNumber):
 			roomName = 'room{}'.format(i + 1)
 			self.rooms[roomName] = Room(roomName)
+
+		# Open the connection to the database.
+		self.database = Database()
+		self.database.initialize()
 
 	# Logs an incoming message to the terminal.
 	def logMessage(self, message, socketId):
@@ -108,3 +113,7 @@ class Master:
 	# A player updates their input box.
 	def updateInputBox(self, socketId, data):
 		return self.bounce(socketId, 'updateInputBox', data)
+
+	# Player submits a high score.
+	def submit(self, socketId, data):
+		return self.database.submitHighScore(data['username'], data['mode'], data['high'])

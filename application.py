@@ -89,6 +89,12 @@ def updateInputBox(data):
 	master.logMessage('updateInputBox', request.sid)
 	return master.updateInputBox(request.sid, data)
 
+# A player has submitted a high score.
+@socketio.on('submit')
+def submit(data):
+	master.logMessage('submit', request.sid)
+	return master.submit(request.sid, data)
+
 # Run the app with web sockets capabilities.
 if __name__ == '__main__':
 	app.debug = True

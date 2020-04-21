@@ -191,7 +191,7 @@ class Arena extends ElementBox {
 		else if (this.state == STATE_SUBMIT) {
 			if (code == ENTER) {
 				let username = this.submitBox.getInput();
-				client.sendMessage('submit', {username: username, high: this.high});
+				client.sendMessage('submit', {username: username, mode: mode, high: this.high});
 				client.startAgain();
 			}
 			else {
