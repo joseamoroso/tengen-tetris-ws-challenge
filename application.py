@@ -23,6 +23,11 @@ def solo():
 def duo():
 	return render_template('duo.html')
 
+# Serve the score board tables.
+@app.route('/scoreboard', methods=['GET'])
+def scoreboard():
+	return render_template('scoreboard.html', solo=master.getScores('solo'), duo=master.getScores('duo'))
+
 
 # A client requests to play in duo mode.
 @socketio.on('requestDuoGame')

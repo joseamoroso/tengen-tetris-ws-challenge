@@ -136,3 +136,14 @@ class Database:
 		# New high score is not higher than the previous one.
 		self.printStatus()
 		return True
+
+	# Returns the requested scores of the selected mode.
+	def getScores(self, mode):
+		query = "SELECT * FROM " + mode + " ORDER BY high DESC;"
+		result = self.executeQuery(query)
+
+		if result == None:
+			print('DATABASE: cannot send back the scores')
+			print(Error)
+
+		return result

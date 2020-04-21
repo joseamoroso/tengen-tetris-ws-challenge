@@ -117,3 +117,6 @@ class Master:
 	# Player submits a high score.
 	def submit(self, socketId, data):
 		return self.database.submitHighScore(data['username'], data['mode'], data['high'])
+
+	def getScores(self, mode):
+		return self.database.getScores(mode)
