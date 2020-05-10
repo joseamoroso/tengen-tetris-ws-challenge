@@ -130,6 +130,6 @@ function keyPressed() {
 }
 
 function keyReleased() {
-	client.keyReleased(keyCode);
+	client.keyReleased(keyCode, key);
 	return false;
 }

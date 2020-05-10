@@ -17,6 +17,7 @@ const POINTS = {
 
 const PIECES = ['T', 'J', 'Z', 'O', 'S', 'L', 'I'];
 
+/* General UI definitions. */
 const TEXT_SIZE = 16;
 const BORDER_STROKE_WEIGHT = 3;
 const TICK_DIAMETER = 8;
@@ -24,6 +25,7 @@ const COLOR_WHITE = 255;
 const COLOR_GREY = 40;
 const COLOR_BLACK = 0;
 
+/* Some constant texts in the UI. */
 const TEXT_TRY_AGAIN = 'TRY AGAIN';
 const TEXT_SUBMIT_AND_TRY_AGAIN = 'SUBMIT AND TRY AGAIN';
 const TEXT_GAME_OVER = 'GAME OVER';
@@ -32,11 +34,20 @@ const TEXT_PAUSED = 'PAUSED';
 const TEXT_LEVEL_SELECTOR_TITLE = 'SELECT LEVEL';
 const TEXT_WAIT_SELECTION = 'WAIT FOR ADVERSARY\nLEVEL SELECTION';
 
+/* States of the game. */
 const STATE_SELECT_LEVEL = 'selectLevel';
 const STATE_WAIT_ADVERSARY_SELECTION = 'waitingAdversarySelection';
 const STATE_PLAY = 'play';
 const STATE_GAME_OVER = 'gameOver';
 const STATE_SUBMIT = 'submit';
+
+/* Key definitions to pass from client to arena. */
+const KEY_PAUSE = ' ';
+const KEY_DOWN = 'key_down';
+const KEY_UP = 'key_up';
+const KEY_RIGHT = 'key_right';
+const KEY_LEFT = 'key_left';
+const KEY_ENTER = 'key_enter';
 
 /* This class controls the highest level logic of the game. */
 class Client {
@@ -125,7 +136,7 @@ class Client {
 
 	/* Gets called when a key is pressed. */
 	keyPressed(code, key) {
-		if (key == ' ') {
+		if (key == KEY_PAUSE) {
 			if (this.mode == MODE_SOLO && !this.lost || this.mode == MODE_DUO) {
 				this.togglePause();
 			}
@@ -136,17 +147,42 @@ class Client {
 			}
 		}
 		else {
-			/* For any other key, send the key to the active arena. */
+			/* For any other key, get the definition and send it to the arena. */
 			if (this.activeArena != undefined && !this.paused) {
-				this.activeArena.keyPressed(code, key, this.mode);
+				this.activeArena.keyPressed(this.decideKeyDefinition(code, key), code, key, this.mode);
 			}
 		}
 	}
 
+	/* Decides a common definition depending on the key pressed. */
+	decideKeyDefinition(code, key) {
+		if (code == UP_ARROW || key == 'w') {
+			return KEY_UP;
+		}
+		else if (code == DOWN_ARROW || key == 's') {
+			return KEY_DOWN;
+		}
+		else if (code == RIGHT_ARROW || key == 'd') {
+			return KEY_RIGHT;
+		}
+		else if (code == LEFT_ARROW || key == 'a') {
+			return KEY_LEFT;
+		}
+		else if (code == ENTER) {
+			return KEY_ENTER;
+		}
+		else {
+			return undefined;
+		}
+	}
+
 	/* Gets called when a key is released. */
-	keyReleased(code) {
-		if (this.activeArena != undefined && !this.paused && !this.lost) {
-			this.activeArena.keyReleased(code);
+	keyReleased(code, key) {
+		if (this.activeArena != undefined) {
+			let definition = this.decideKeyDefinition(code, key);
+			if (definition != undefined) {
+				this.activeArena.keyReleased(definition);
+			}
 		}
 	}
 

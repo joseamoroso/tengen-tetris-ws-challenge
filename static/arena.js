@@ -142,42 +142,42 @@ class Arena extends ElementBox {
 	}
 
 	/* Handles keys pressed on the keyboard. */
-	keyPressed(code, key, mode) {
+	keyPressed(keyDefinition, code, key, mode) {
 		if (this.state == STATE_SELECT_LEVEL) {
-			if (code == UP_ARROW || code == DOWN_ARROW) {
-				this.levelSelectorBox.keyPressed(code, mode);
+			if (keyDefinition == KEY_UP || keyDefinition == KEY_DOWN) {
+				this.levelSelectorBox.keyPressed(keyDefinition, mode);
 			}
-			else if (code == ENTER) {
+			else if (keyDefinition == KEY_ENTER) {
 				this.level = this.levelSelectorBox.getActiveTickBoxIndex();
 				this.updateLevelLinesBox();
 				client.playerSelectedInitialLevel(this.level);
 			}
 		}
 		else if (this.state == STATE_PLAY) {
-			if (code == LEFT_ARROW) {
+			if (keyDefinition == KEY_LEFT) {
 				if (this.piece.move(DIR_LEFT, this.grid) && mode == MODE_DUO) {
 					client.sendMessage('updatePiece', this.packPiece());
 				}
 			}
-			else if (code == RIGHT_ARROW) {
+			else if (keyDefinition == KEY_RIGHT) {
 				if (this.piece.move(DIR_RIGHT, this.grid) && mode == MODE_DUO) {
 					client.sendMessage('updatePiece', this.packPiece());
 				}
 			}
-			else if (code == UP_ARROW) {
+			else if (keyDefinition == KEY_UP) {
 				if (this.piece.rotate(this.grid) && mode == MODE_DUO) {
 					client.sendMessage('updatePiece', this.packPiece());
 				}
 			}
-			else if (code == DOWN_ARROW) {
+			else if (keyDefinition == KEY_DOWN) {
 				this.downKeyPressed = true;
 			}
 		}
 		else if (this.state == STATE_GAME_OVER) {
-			if (code == UP_ARROW || code == DOWN_ARROW) {
-				this.gameOverSelectorBox.keyPressed(code, mode);
+			if (keyDefinition == KEY_UP || keyDefinition == KEY_DOWN) {
+				this.gameOverSelectorBox.keyPressed(keyDefinition, mode);
 			}
-			else if (code == ENTER) {
+			else if (keyDefinition == KEY_ENTER) {
 				let optionSelected = this.gameOverSelectorBox.getActiveTickBoxIndex();
 				if (optionSelected == 0) {
 					client.startAgain();
@@ -189,7 +189,7 @@ class Arena extends ElementBox {
 			}
 		}
 		else if (this.state == STATE_SUBMIT) {
-			if (code == ENTER) {
+			if (keyDefinition == KEY_ENTER) {
 				let username = this.submitBox.getInput();
 				client.sendMessage('submit', {username: username, mode: mode, high: this.high});
 				client.startAgain();
@@ -201,8 +201,8 @@ class Arena extends ElementBox {
 	}
 
 	/* Handles keys released from the keyboard. */
-	keyReleased(code) {
-		if (code == DOWN_ARROW) {
+	keyReleased(keyDefinition) {
+		if (keyDefinition == KEY_DOWN) {
 			this.downKeyPressed = false;
 		}
 	}

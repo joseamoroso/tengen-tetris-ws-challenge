@@ -32,12 +32,12 @@ class SelectorBox extends ElementBox {
 	}
 
 	/* Updates the selection. */
-	keyPressed(code, mode) {
+	keyPressed(keyDefinition, mode) {
 		let changed = false;
-		if (code == UP_ARROW) {
+		if (keyDefinition == KEY_UP) {
 			changed = this.moveSelectionUp();
 		}
-		else if (code == DOWN_ARROW) {
+		else if (keyDefinition == KEY_DOWN) {
 			changed = this.moveSelectionDown();
 		}
 
