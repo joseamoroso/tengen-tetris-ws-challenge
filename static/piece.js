@@ -80,6 +80,11 @@ class Piece {
 
 	/* Tries to rotate this piece inside the grid provided. */
 	rotate(grid) {
+		/* Do not rotate the square piece. */
+		if (this.type == 'O') {
+			return false;
+		}
+		
 		/* Create a new piece that is this one rotated. */
 		let rotatedPiece = this.createRotatedPiece();
 		for (let square of rotatedPiece.squares) {
