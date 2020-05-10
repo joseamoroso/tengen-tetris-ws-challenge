@@ -273,11 +273,6 @@ class Client {
 		if (this.activeArena != undefined && !this.paused && !this.lost) {
 			this.activeArena.update(this.mode);
 		}
-
-		/* Check the next piece generator is updated. */
-		if (this.mode == MODE_DUO && this.activeArena != undefined) {
-			this.nextPieceGenerator.update();
-		}
 	}
 
 	display() {
