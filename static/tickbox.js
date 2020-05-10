@@ -3,11 +3,11 @@ class TickBox {
 		/* Calculate the center of the ellipses. */
 		this.centers = {};
 		this.centers.left = {
-			x: initialx + width / 16,
+			x: initialx + height / 2,
 			y: initialy + height / 2
 		};
 		this.centers.right = {
-			x: initialx + width - width / 16,
+			x: initialx + width - height / 2,
 			y: initialy + height / 2
 		};
 
