@@ -11,7 +11,7 @@ class SelectorBox extends ElementBox {
 		let widthTextBox = 3 * width / 4;
 		let initialxTextBox = initialx + (width - widthTextBox) / 2;
 
-		/* Create a set of small tick boxes on the left and text boxes on the right. */
+		/* Create a tick box and a text box for each of the options. */
 		this.tickBoxes = [];
 		this.textBoxes = [];
 		for (let i = 0; i < options.length; i++) {
