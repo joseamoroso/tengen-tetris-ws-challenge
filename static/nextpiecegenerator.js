@@ -43,11 +43,12 @@ class NextPieceGenerator {
 
 	/* The arena asks for the next piece. */
 	getNextPiece() {
+		let label;
 		if (this.mode == MODE_SOLO) {
-			return new Piece(PIECES[Math.floor(Math.random() * PIECES.length)]);
+			label = PIECES[Math.floor(Math.random() * PIECES.length)];
 		}
 		else if (this.mode == MODE_DUO) {
-			return new Piece(this.pieceBuffer.shift());
+			label = this.pieceBuffer.shift();
 		}
 
 		/* Check if we are running out of pieces and ask the server for more if needed. */
@@ -55,5 +56,7 @@ class NextPieceGenerator {
 			client.sendMessage('requestNextBatch', {});
 			this.waitingAnswer = true;
 		}
+
+		return new Piece(label);
 	}
 }
