@@ -73,6 +73,13 @@ class Arena extends ElementBox {
 
 		/* Create the high score submit box. */
 		this.submitBox = new InputBox(initialxBox, initialyBox, boxWidth, boxHeight, TEXT_SUBMIT);
+
+		/* Calculate the time of one animation, depending on the level. */
+		this.timePerAnimation = {};
+		for (let level of Object.keys(FRAMES)) {
+			this.timePerAnimation[level] = FRAMES[level] * 1000 / 60;
+		}
+		this.timeSoftDrop = FRAMES_SOFT_DROP * 1000 / 60;
 	}
 
 	/* Update the elements in the arena. Function called in a loop. */
@@ -100,13 +107,13 @@ class Arena extends ElementBox {
 
 			/* If the down key is pressed, directly try to move the piece. */
 			if (this.downKeyPressed) {
-				if (this.stopwatch.getElapsedTime() > 25) {
+				if (this.stopwatch.getElapsedTime() > this.timeSoftDrop) {
 					if (this.movePieceDown() && mode == MODE_DUO) {
 						client.sendMessage('updatePiece', this.packPiece());
 					}
 				}
 			}
-			else if (this.stopwatch.getElapsedTime() > 400) {
+			else if (this.stopwatch.getElapsedTime() > this._calculateElapsedTimeFromLevel()) {
 				if (this.movePieceDown() && mode == MODE_DUO) {
 					client.sendMessage('updatePiece', this.packPiece());
 				}
@@ -385,5 +392,23 @@ class Arena extends ElementBox {
 	/* Updates the text inside the score box. */
 	_updateScoreBox() {
 		this.scoreBox.changeText('SCORE: ' + this.score + '\nHIGH: ' + this.high);
+	}
+
+	/* Returns the time a piece has to stay in place before moving down,
+	depending on the current level. */
+	_calculateElapsedTimeFromLevel() {
+		if (this.level < 0) {
+			return undefined;
+		}
+
+		if (this.level >= 0 && this.level <= 18) {
+			return this.timePerAnimation[this.level];
+		}
+		else if (this.level >= 19 && this.level <= 28) {
+			return this.timePerAnimation[19];
+		}
+		else {
+			return this.timePerAnimation[29];
+		}
 	}
 }
