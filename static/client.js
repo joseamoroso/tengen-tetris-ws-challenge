@@ -7,8 +7,9 @@ const DIR_LEFT = 'left';
 const MODE_SOLO = 'solo';
 const MODE_DUO = 'duo';
 
-/* Scoring system at level zero. */
-const POINTS = {
+/* Number of lines cleared and corresponding points at level zero. */
+const POINTS_LEVEL_ZERO = {
+	0: 0,
 	1: 40,
 	2: 100,
 	3: 300,

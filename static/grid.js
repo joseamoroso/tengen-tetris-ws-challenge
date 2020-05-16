@@ -1,4 +1,4 @@
-/* This is the main grid for Tetris, 20x10, where the squares that fall to the floor
+/* This is the main grid for Tetris, 20x10, where the pieces that fall to the floor
 are stored. */
 class Grid extends ElementBox {
 	constructor(initialx, initialy, width, height) {
@@ -40,10 +40,10 @@ class Grid extends ElementBox {
 		return true;
 	}
 
-	/* After a piece drops in the grid, this function gets called to assign
-	scores if needed and clean full lines. */
-	assignScoresAndClean() {
-		/* Get a list of the lines that are full of squares. */
+	/* Called by the arena, detects the full lines in the grid, clears them and returns
+	the number of them. */
+	getNumFullLinesAndClear() {
+		/* Create a list with the indices of the full lines. */
 		let fullLines = [];
 		let lineFull = false;
 		for (let i = 0; i < 20; i++) {
@@ -61,69 +61,11 @@ class Grid extends ElementBox {
 			}
 		}
 
-		/* Clean the full lines and return the score. */
-		this.cleanLines(fullLines);
-		return this.getScoreAndLines(fullLines);
-	}
+		/* Clear the full lines from the grid. */
+		this._clearLines(fullLines);
 
-	/* Cleans the full lines given as indexes. Whenever a line is cleared, the
-	grid moves downwards. */
-	cleanLines(fullLines) {
-		for (let i = 0; i < fullLines.length; i++) {
-			/* Iterate from the current line to the top. */
-			for (let k = fullLines[i]; k >= 0; k--) {
-
-				for (let j = 0; j < 10; j++) {
-					/* If not the first row, copy the (k-1)-th line into the k-th line. */
-					if (k != 0) {
-						this.squares[k][j].visible = this.squares[k - 1][j].visible;
-					}
-					/* Set the first row black. */
-					else {
-						this.squares[k][j].visible = false;
-					}
-				}
-			}
-		}
-	}
-
-	/* Receives the list of full lines and assigns a score. */
-	getScoreAndLines(fullLines) {
-		/* Get the groups of lines that are next to each other. */
-		let groupLines;
-		if (fullLines.length != 0) {
-			groupLines = [1];
-			let currentGroup = 0;
-			for (let i = 1; i < fullLines.length; i++) {
-				if (fullLines[i] == fullLines[i - 1] + 1) {
-					/* Lines are consecutive. */
-					if (typeof groupLines[currentGroup] === 'undefined') {
-						groupLines.push(2);
-					}
-					else {
-						groupLines[currentGroup] += 1;
-					}
-				}
-				else {
-					currentGroup += 1;
-				}
-			}
-		}
-		else {
-			groupLines = [];
-		}
-
-
-		/* Assign score depending on the number of lines cleared together. */
-		let score = 0;
-		for (let k = 0; k < groupLines.length; k++) {
-			score += POINTS[groupLines[k]];
-		}
-
-		return {
-			'score': score,
-			'lines': fullLines.length
-		};
+		/* Return the number of full lines. */
+		return fullLines.length;
 	}
 
 	/* Packs the info about this grid for the server. */
@@ -132,14 +74,14 @@ class Grid extends ElementBox {
 		for (let i = 0; i < 20; i++) {
 			pack.push([]);
 			for (let j = 0; j < 10; j++) {
-				pack[i].push({'visible': this.squares[i][j].visible});
+				pack[i].push({visible: this.squares[i][j].visible});
 			}
 		}
 
 		return pack;
 	}
 
-	/* The server has sent an update on this grid. */
+	/* The server sends info to update this grid. */
 	receiveServerUpdate(data) {
 		for (let i = 0; i < 20; i++) {
 			for (let j = 0; j < 10; j++) {
@@ -159,5 +101,25 @@ class Grid extends ElementBox {
 
 		/* Display the border around the grid. */
 		super.display();
+	}
+
+	/* Receives a list with the indices of the full lines and clears them. When a line
+	is cleared, the grid moves downwards. */
+	_clearLines(fullLines) {
+		for (let i = 0; i < fullLines.length; i++) {
+			/* Iterate from the current line to the top. */
+			for (let k = fullLines[i]; k >= 0; k--) {
+				for (let j = 0; j < 10; j++) {
+					/* If not the first row, copy the (k-1)-th line into the k-th line. */
+					if (k != 0) {
+						this.squares[k][j].visible = this.squares[k - 1][j].visible;
+					}
+					/* Set the first row black. */
+					else {
+						this.squares[k][j].visible = false;
+					}
+				}
+			}
+		}
 	}
 }

@@ -35,6 +35,7 @@ class Arena extends ElementBox {
 		this.stopwatch = new Stopwatch();
 
 		/* Variables for the logic of the game. */
+		this.initialLevel = 0;
 		this.level = 0;
 		this.high = 0;
 		this.score = 0;
@@ -121,22 +122,18 @@ class Arena extends ElementBox {
 			this.grid.receive(this.piece);
 			this.piece = undefined;
 
-			/* Get the score of the current drop to the grid. */
-			let result = this.grid.assignScoresAndClean();
-			this.score += result.score;
-			this.lines += result.lines;
-			this.checkLevel();
+			/* Get the number of lines that are full and also clear them. */
+			let numFullLines = this.grid.getNumFullLinesAndClear();
 
-			/* Update the necessary boxes. */
-			this.updateLevelLinesBox();
-			this.updateScoreBox();
+			/* Calculate the new score and lines. */
+			this._assignScoreLinesLevel(numFullLines);
 
 			/* Check if this player has lost. */
 			this.checkLose();
 			return false;
 		}
 
-		/* Restart the stopwatch for a new animation frame. */
+		/* The piece was able to move down, restart the stopwatch for a new animation frame. */
 		this.stopwatch.start();
 		return true;
 	}
@@ -148,8 +145,10 @@ class Arena extends ElementBox {
 				this.levelSelectorBox.keyPressed(keyDefinition, mode);
 			}
 			else if (keyDefinition == KEY_ENTER) {
-				this.level = this.levelSelectorBox.getActiveTickBoxIndex();
-				this.updateLevelLinesBox();
+				let initialLevel = this.levelSelectorBox.getActiveTickBoxIndex();
+				this.initialLevel = initialLevel;
+				this.level = initialLevel;
+				this._updateLevelLinesBox();
 				client.playerSelectedInitialLevel(this.level);
 			}
 		}
@@ -214,7 +213,7 @@ class Arena extends ElementBox {
 				/* Update the high score if needed. */
 				if (this.score > this.high) {
 					this.high = this.score;
-					this.updateScoreBox();
+					this._updateScoreBox();
 				}
 
 				client.playerLost(this.high);
@@ -227,21 +226,6 @@ class Arena extends ElementBox {
 		return false;
 	}
 
-	/* Checks if the player has cleared enough lines to level up. */
-	checkLevel() {
-		this.level = Math.floor(this.lines / 10);
-	}
-
-	/* Updates the text inside the level lines box. */
-	updateLevelLinesBox() {
-		this.levelLinesBox.changeText('LEVEL: ' + this.level + '\nLINES: ' + this.lines);
-	}
-
-	/* Updates the text inside the score box. */
-	updateScoreBox() {
-		this.scoreBox.changeText('SCORE: ' + this.score + '\nHIGH: ' + this.high);
-	}
-
 	/* Returns the current high score. */
 	getHighScore() {
 		return this.high;
@@ -250,7 +234,7 @@ class Arena extends ElementBox {
 	/* Sets the high score. */
 	setHighScore(high) {
 		this.high = high;
-		this.updateScoreBox();
+		this._updateScoreBox();
 	}
 
 	getLevel() {
@@ -259,7 +243,7 @@ class Arena extends ElementBox {
 
 	setLevel(level) {
 		this.level = level;
-		this.updateLevelLinesBox();
+		this._updateLevelLinesBox();
 	}
 
 	setState(state) {
@@ -298,8 +282,8 @@ class Arena extends ElementBox {
 		this.lines = data.lines;
 
 		/* Upate the text boxes. */
-		this.updateLevelLinesBox();
-		this.updateScoreBox();
+		this._updateLevelLinesBox();
+		this._updateScoreBox();
 
 		/* Update the grid and the statistics. */
 		this.grid.receiveServerUpdate(data.grid);
@@ -374,5 +358,32 @@ class Arena extends ElementBox {
 		fill(0, 180);
 		noStroke();
 		rect(this.initialx, this.initialy, this.width, this.height);
+	}
+
+	/* Receives the number of lines cleared in this action, and updates
+	score, lines and level, and their boxes. */
+	_assignScoreLinesLevel(numLinesCleared) {
+		/* Update the score and the number of lines. */
+		this.score += (this.level + 1) * POINTS_LEVEL_ZERO[numLinesCleared];
+		this.lines += numLinesCleared;
+
+		/* Update the level if necessary. */
+		if (this.lines >= (this.initialLevel + 1) * 10) {
+			this.level = Math.floor(this.lines / 10);
+		}
+
+		/* Update the boxes if necessary. */
+		this._updateLevelLinesBox();
+		this._updateScoreBox();
+	}
+
+	/* Updates the text inside the level lines box. */
+	_updateLevelLinesBox() {
+		this.levelLinesBox.changeText('LEVEL: ' + this.level + '\nLINES: ' + this.lines);
+	}
+
+	/* Updates the text inside the score box. */
+	_updateScoreBox() {
+		this.scoreBox.changeText('SCORE: ' + this.score + '\nHIGH: ' + this.high);
 	}
 }
