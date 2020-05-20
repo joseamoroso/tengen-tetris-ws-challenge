@@ -45,6 +45,15 @@ const FRAMES = {
 /* Number of frames for the piece, while in soft drop. */
 const FRAMES_SOFT_DROP = 2;
 
+/* Define the states of the DAS algorithm. */
+const DAS_STATE_FIRST = 'das_first';
+const DAS_STATE_SECOND = 'das_second';
+const DAS_STATE_THIRD = 'das_third';
+
+/* Define the frames for the DAS algorithm. */
+const DAS_FRAMES_SECOND_STATE = 16;
+const DAS_FRAMES_THIRD_STATE = 6;
+
 const PIECES = ['T', 'J', 'Z', 'O', 'S', 'L', 'I'];
 
 /* General UI definitions. */

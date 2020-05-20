@@ -40,7 +40,16 @@ class Arena extends ElementBox {
 		this.high = 0;
 		this.score = 0;
 		this.lines = 0;
-		this.downKeyPressed = false;
+
+		/* Create the DAS algorithm that will handle left and right movements. */
+		this.das = new Das();
+
+		/* Create a dictionary for the keys that are pressed. */
+		this.keysPressed = {
+			KEY_DOWN: false,
+			KEY_RIGHT: false,
+			KEY_LEFT: false,
+		};
 
 		/* Establish the initial state of the arena. */
 		this.state = STATE_SELECT_LEVEL;
@@ -105,8 +114,25 @@ class Arena extends ElementBox {
 				this.stopwatch.start();
 			}
 
-			/* If the down key is pressed, directly try to move the piece. */
-			if (this.downKeyPressed) {
+			/* If the right or left keys are currently pressed, try to move the
+			piece right or left depending on the state of the DAS. */
+			if (this.keysPressed[KEY_LEFT]) {
+				if (this.das.canMove()) {
+					if (this.piece.move(DIR_LEFT, this.grid) && mode == MODE_DUO) {
+						client.sendMessage('updatePiece', this.packPiece());
+					}
+				}
+			}
+			else if (this.keysPressed[KEY_RIGHT]) {
+				if (this.das.canMove()) {
+					if (this.piece.move(DIR_RIGHT, this.grid) && mode == MODE_DUO) {
+						client.sendMessage('updatePiece', this.packPiece());
+					}
+				}
+			}
+
+			/* Try to move the piece down. */
+			if (this.keysPressed[KEY_DOWN]) {
 				if (this.stopwatch.getElapsedTime() > this.timeSoftDrop) {
 					if (this.movePieceDown() && mode == MODE_DUO) {
 						client.sendMessage('updatePiece', this.packPiece());
@@ -160,23 +186,19 @@ class Arena extends ElementBox {
 			}
 		}
 		else if (this.state == STATE_PLAY) {
-			if (keyDefinition == KEY_LEFT) {
-				if (this.piece.move(DIR_LEFT, this.grid) && mode == MODE_DUO) {
-					client.sendMessage('updatePiece', this.packPiece());
-				}
-			}
-			else if (keyDefinition == KEY_RIGHT) {
-				if (this.piece.move(DIR_RIGHT, this.grid) && mode == MODE_DUO) {
-					client.sendMessage('updatePiece', this.packPiece());
+			if (keyDefinition == KEY_LEFT || keyDefinition == KEY_RIGHT || keyDefinition == KEY_DOWN) {
+				this.keysPressed[keyDefinition] = true;
+
+				/* If the right or left keys have just been pressed, activate
+				the DAS algorithm. */
+				if (keyDefinition == KEY_RIGHT || keyDefinition == KEY_LEFT) {
+					this.das.activate();
 				}
 			}
 			else if (keyDefinition == KEY_UP) {
 				if (this.piece.rotate(this.grid) && mode == MODE_DUO) {
 					client.sendMessage('updatePiece', this.packPiece());
 				}
-			}
-			else if (keyDefinition == KEY_DOWN) {
-				this.downKeyPressed = true;
 			}
 		}
 		else if (this.state == STATE_GAME_OVER) {
@@ -208,8 +230,13 @@ class Arena extends ElementBox {
 
 	/* Handles keys released from the keyboard. */
 	keyReleased(keyDefinition) {
-		if (keyDefinition == KEY_DOWN) {
-			this.downKeyPressed = false;
+		if (keyDefinition == KEY_DOWN || keyDefinition == KEY_RIGHT || keyDefinition == KEY_LEFT) {
+			this.keysPressed[keyDefinition] = false;
+
+			/* If the right or left key has been released, indicate that the DAS algorithm has to pause. */
+			if (keyDefinition == KEY_RIGHT || keyDefinition == KEY_LEFT) {
+				this.das.deactivate();
+			}
 		}
 	}
 
