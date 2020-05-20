@@ -163,6 +163,12 @@ class Arena extends ElementBox {
 
 			/* Check if this player has lost. */
 			this.checkLose();
+
+			/* Mark all movement keys as not pressed. */
+			this.keysPressed[KEY_LEFT] = false;
+			this.keysPressed[KEY_RIGHT] = false;
+			this.keysPressed[KEY_DOWN] = false;
+
 			return false;
 		}
 
