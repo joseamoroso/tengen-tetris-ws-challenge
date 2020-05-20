@@ -199,7 +199,7 @@ class Arena extends ElementBox {
 			else if (keyDefinition == KEY_DOWN) {
 				this.keysPressed[keyDefinition] = true;
 			}
-			else if (keyDefinition == KEY_UP) {
+			else if (keyDefinition == KEY_UP && this.piece != undefined) {
 				if (this.piece.rotate(this.grid) && mode == MODE_DUO) {
 					client.sendMessage('updatePiece', this.packPiece());
 				}
