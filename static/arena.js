@@ -200,7 +200,12 @@ class Arena extends ElementBox {
 				this.keysPressed[keyDefinition] = true;
 			}
 			else if (keyDefinition == KEY_UP && this.piece != undefined) {
-				if (this.piece.rotate(this.grid) && mode == MODE_DUO) {
+				if (this.piece.rotate(this.grid, ROTATION_DIR_RIGHT) && mode == MODE_DUO) {
+					client.sendMessage('updatePiece', this.packPiece());
+				}
+			}
+			else if (keyDefinition == KEY_ROT_LEFT && this.piece != undefined) {
+				if (this.piece.rotate(this.grid, ROTATION_DIR_LEFT) && mode == MODE_DUO) {
 					client.sendMessage('updatePiece', this.packPiece());
 				}
 			}

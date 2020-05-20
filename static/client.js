@@ -3,6 +3,10 @@ const DIR_DOWN = 'down';
 const DIR_RIGHT = 'right';
 const DIR_LEFT = 'left';
 
+/* Define the two possible rotation directions. */
+const ROTATION_DIR_LEFT = 'rot_left';
+const ROTATION_DIR_RIGHT = 'rot_right';
+
 /* Define the modes of play. */
 const MODE_SOLO = 'solo';
 const MODE_DUO = 'duo';
@@ -84,6 +88,7 @@ const STATE_SUBMIT = 'submit';
 const KEY_PAUSE = ' ';
 const KEY_DOWN = 'key_down';
 const KEY_UP = 'key_up';
+const KEY_ROT_LEFT = 'key_rot_left';
 const KEY_RIGHT = 'key_right';
 const KEY_LEFT = 'key_left';
 const KEY_ENTER = 'key_enter';
@@ -195,8 +200,11 @@ class Client {
 
 	/* Decides a common definition depending on the key pressed. */
 	decideKeyDefinition(code, key) {
-		if (code == UP_ARROW || key == 'w') {
+		if (code == UP_ARROW || key == 'w' || key == 'n') {
 			return KEY_UP;
+		}
+		else if (key == 'm') {
+			return KEY_ROT_LEFT;
 		}
 		else if (code == DOWN_ARROW || key == 's') {
 			return KEY_DOWN;

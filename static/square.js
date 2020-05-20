@@ -49,10 +49,18 @@ class Square {
 	}
 
 	/* Returns a new square that is this one rotated from the center given. */
-	rotatedFrom(center) {
-		let deltaX = this.j - center.j;
-		let deltaY = center.i - this.i;
-		return new Square(center.i + deltaX, center.j + deltaY, true);
+	rotatedFrom(center, rotationDirection) {
+		let idelta, jdelta;
+		if (rotationDirection == ROTATION_DIR_RIGHT) {
+			idelta = this.j - center.j;
+			jdelta = center.i - this.i;
+		}
+		else if (rotationDirection == ROTATION_DIR_LEFT) {
+			idelta = center.j - this.j;
+			jdelta = this.i - center.i;
+		}
+
+		return new Square(center.i + idelta, center.j + jdelta, true);
 	}
 
 	/* Displays this square if visible. Receives the sizes of the grid. */

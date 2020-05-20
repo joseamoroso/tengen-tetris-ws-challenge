@@ -79,14 +79,14 @@ class Piece {
 	}
 
 	/* Tries to rotate this piece inside the grid provided. */
-	rotate(grid) {
+	rotate(grid, rotationDirection) {
 		/* Do not rotate the square piece. */
 		if (this.type == 'O') {
 			return false;
 		}
-		
-		/* Create a new piece that is this one rotated. */
-		let rotatedPiece = this.createRotatedPiece();
+
+		/* Create a new piece that is this one rotated and check the validity of all positions. */
+		let rotatedPiece = this._createRotatedPiece(rotationDirection);
 		for (let square of rotatedPiece.squares) {
 			if (!grid.validPosition(square.i, square.j)) {
 				return false;
@@ -97,19 +97,6 @@ class Piece {
 		this.getValuesFrom(rotatedPiece);
 
 		return true;
-	}
-
-	/* Returns a new piece with the squares of this one rotated. */
-	createRotatedPiece() {
-		let rotatedPiece = new Piece(undefined);
-		for (let square of this.squares) {
-			let newSquare = square.rotatedFrom(this.center);
-			rotatedPiece.squares.push(newSquare);
-		}
-		rotatedPiece.center = rotatedPiece.squares[0];
-		rotatedPiece.type = this.type;
-
-		return rotatedPiece;
 	}
 
 	/* Copies the values from the piece given as an argument. */
@@ -147,5 +134,19 @@ class Piece {
 		for (let square of this.squares) {
 			square.display(initialx, initialy, size);
 		}
+	}
+
+	/* Returns a new piece with the squares of this one rotated
+	in the requested direction. */
+	_createRotatedPiece(rotationDirection) {
+		let rotatedPiece = new Piece(undefined);
+		for (let square of this.squares) {
+			let newSquare = square.rotatedFrom(this.center, rotationDirection);
+			rotatedPiece.squares.push(newSquare);
+		}
+		rotatedPiece.center = rotatedPiece.squares[0];
+		rotatedPiece.type = this.type;
+
+		return rotatedPiece;
 	}
 }
