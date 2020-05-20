@@ -186,14 +186,12 @@ class Arena extends ElementBox {
 			}
 		}
 		else if (this.state == STATE_PLAY) {
-			if (keyDefinition == KEY_LEFT || keyDefinition == KEY_RIGHT || keyDefinition == KEY_DOWN) {
+			if (keyDefinition == KEY_LEFT && !this.keysPressed[KEY_RIGHT] || keyDefinition == KEY_RIGHT && !this.keysPressed[KEY_LEFT]) {
 				this.keysPressed[keyDefinition] = true;
-
-				/* If the right or left keys have just been pressed, activate
-				the DAS algorithm. */
-				if (keyDefinition == KEY_RIGHT || keyDefinition == KEY_LEFT) {
-					this.das.activate();
-				}
+				this.das.activate();
+			}
+			else if (keyDefinition == KEY_DOWN) {
+				this.keysPressed[keyDefinition] = true;
 			}
 			else if (keyDefinition == KEY_UP) {
 				if (this.piece.rotate(this.grid) && mode == MODE_DUO) {
@@ -230,13 +228,12 @@ class Arena extends ElementBox {
 
 	/* Handles keys released from the keyboard. */
 	keyReleased(keyDefinition) {
-		if (keyDefinition == KEY_DOWN || keyDefinition == KEY_RIGHT || keyDefinition == KEY_LEFT) {
+		if (keyDefinition == KEY_LEFT && this.keysPressed[KEY_LEFT] || keyDefinition == KEY_RIGHT && this.keysPressed[KEY_RIGHT]) {
 			this.keysPressed[keyDefinition] = false;
-
-			/* If the right or left key has been released, indicate that the DAS algorithm has to pause. */
-			if (keyDefinition == KEY_RIGHT || keyDefinition == KEY_LEFT) {
-				this.das.deactivate();
-			}
+			this.das.deactivate();
+		}
+		else if (keyDefinition == KEY_DOWN && this.keysPressed[KEY_DOWN]) {
+			this.keysPressed[KEY_DOWN] = false;
 		}
 	}
 
