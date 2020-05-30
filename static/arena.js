@@ -283,7 +283,10 @@ class Arena extends ElementBox {
 		return this.level;
 	}
 
-	setLevel(level) {
+	/* After the arena is initialized, the initial level selected in duo mode
+	is passed to the arena through this function. */
+	setInitialLevel(level) {
+		this.initialLevel = level;
 		this.level = level;
 		this._updateLevelLinesBox();
 	}

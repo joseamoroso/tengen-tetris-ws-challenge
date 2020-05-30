@@ -131,7 +131,7 @@ class Client {
 		}
 		else if (this.mode == MODE_DUO) {
 			this.activeArena = new Arena(0, 0, this.canvasWidth / 2, this.canvasHeight, false);
-			this.activeArena.setLevel(this.arenaInfo.active.initialLevelSelected);
+			this.activeArena.setInitialLevel(this.arenaInfo.active.initialLevelSelected);
 		}
 		this.activeArena.setHighScore(this.arenaInfo.active.highScore);
 	}
@@ -140,7 +140,7 @@ class Client {
 	initializeAdversaryArena() {
 		this.adversaryArena = new Arena(this.canvasWidth / 2, 0, this.canvasWidth / 2, this.canvasHeight, true);
 		this.adversaryArena.setHighScore(this.arenaInfo.adversary.highScore);
-		this.adversaryArena.setLevel(this.arenaInfo.adversary.initialLevelSelected);
+		this.adversaryArena.setInitialLevel(this.arenaInfo.adversary.initialLevelSelected);
 	}
 
 	/* In duo mode, begin the game when the server has found two players. */
@@ -319,7 +319,7 @@ class Client {
 		if (data.state == STATE_PLAY || data.state == STATE_WAIT_ADVERSARY_SELECTION) {
 			/* Keep a copy of the level and update adversary arena. */
 			this.arenaInfo.adversary.initialLevelSelected = data.level;
-			this.adversaryArena.setLevel(data.level);
+			this.adversaryArena.setInitialLevel(data.level);
 
 			/* Set both players to play if state is play. */
 			if (data.state == STATE_PLAY) {
