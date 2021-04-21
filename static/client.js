@@ -200,10 +200,10 @@ class Client {
 
 	/* Decides a common definition depending on the key pressed. */
 	decideKeyDefinition(code, key) {
-		if (code == UP_ARROW || key == 'w' || key == 'n') {
+		if (code == UP_ARROW || key == 'w' || key == 'x') {
 			return KEY_UP;
 		}
-		else if (key == 'm') {
+		else if (key == 'z') {
 			return KEY_ROT_LEFT;
 		}
 		else if (code == DOWN_ARROW || key == 's') {
