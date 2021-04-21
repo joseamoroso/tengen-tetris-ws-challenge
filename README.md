@@ -11,6 +11,8 @@ while the world is falling apart due to the cyborg awakening.
 
 There is a scoreboard to which players can upload their high scores and compete.
 
+![Screenshot of duo mode](https://github.com/aitorperezzz/tengen-tetris/blob/master/images/tengen_readme.png)
+
 ## Game modes
 There are two game modes:
 * Solo: select a level and start playing. You will be on your own. You can pause and quit.
