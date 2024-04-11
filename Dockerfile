@@ -1,5 +1,9 @@
 # Stage 1: Base
-FROM python:3.9 AS base
+# TODO: search for a lite version of the image
+FROM --platform=$BUILDPLATFORM python:3.9 AS base
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+RUN echo "I am running on $BUILDPLATFORM, building for $TARGETPLATFORM" > /log
 
 # Set working directory
 WORKDIR /app

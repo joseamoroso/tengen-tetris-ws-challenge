@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: prueba1
-  pullPolicy: Never
+  repository: jamorosoa/tengen-tetris-ws-challenge-gh
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
@@ -80,3 +80,8 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+volume:
+  name: data
+  path: /
+  server: fs-0e3575afc81fa1d6c
