@@ -1,8 +1,9 @@
+import os
 from sqlite3 import Error, connect
 
 class Database:
 	def __init__(self):
-		self.filename = 'data/database.db'
+		self.filename = os.environ['DB_FILENAME']
 
 	# Initializes the database.
 	def initialize(self):
