@@ -2,6 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+appPort: 8080
+
+env:
+  - name: DB_FILENAME
+    value: /data/database.db
+  - name: ADDRESS
+    value: "0.0.0.0"
+
 replicaCount: 1
 
 image:
@@ -34,7 +42,6 @@ securityContext: {}
 
 service:
   type: NodePort
-  port: 8080
 
 ingress:
   enabled: false
@@ -77,11 +84,3 @@ volume:
   name: data
   path: /data
   server: fs-0c84ef48ed0eb9948
-
-env:
-  - name: DB_FILENAME
-    value: /data/database.db
-  - name: PORT
-    value: "8080"
-  - name: ADDRESS
-    value: "0.0.0.0"
