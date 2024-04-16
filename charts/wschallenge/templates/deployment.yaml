@@ -27,7 +27,7 @@ spec:
         - name: {{ .Chart.Name }}
           env:
             - name: PORT
-              value: {{ .Values.appPort | toString  }}
+              value: "{{ .Values.appPort | toString  }}"
             {{- toYaml .Values.env | nindent 12 }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
