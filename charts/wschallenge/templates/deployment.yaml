@@ -27,7 +27,7 @@ spec:
         - name: {{ .Chart.Name }}
           env:
             - name: PORT
-              value: {{ .Values.appPort }}
+              value: {{ .Values.appPort | toString  }}
             {{- toYaml .Values.env | nindent 12 }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -35,7 +35,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.appPort  }}
               protocol: TCP
           livenessProbe:
             httpGet:
