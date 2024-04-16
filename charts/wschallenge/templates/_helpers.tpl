@@ -60,3 +60,14 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create port the app will use
+*/}}
+{{- define "wschallenge.appPort" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "wschallenge.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
