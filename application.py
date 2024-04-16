@@ -104,4 +104,4 @@ def submit(data):
 # Run the app with web sockets capabilities.
 if __name__ == '__main__':
 	app.debug = True
-	socketio.run(app, host=os.environ['ADDRESS'], port=os.environ['PORT'])
+	socketio.run(app, host=os.environ['ADDRESS'], port=int(os.environ['PORT']))
