@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: jamorosoa/tengen-tetris-ws-challenge
+  repository: jamorosoa/tengen-tetris-ws-challenge-gh
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
