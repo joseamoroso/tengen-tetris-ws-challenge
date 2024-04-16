@@ -54,7 +54,7 @@ ingress:
   hosts:
     - host: wschallenge1.joseamoroso.com
       paths:
-        - path: /*
+        - path: /
           pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
