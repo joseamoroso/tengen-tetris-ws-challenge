@@ -76,7 +76,7 @@ affinity: {}
 volume:
   name: data
   path: /data
-  server: fs-0e60f181273fe6c56
+  server: fs-0c84ef48ed0eb9948
 
 env:
   - name: DB_FILENAME
