@@ -49,25 +49,3 @@ Selector labels
 app.kubernetes.io/name: {{ include "wschallenge.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "wschallenge.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "wschallenge.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
-
-{{/*
-Create port the app will use
-*/}}
-{{- define "wschallenge.appPort" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "wschallenge.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
