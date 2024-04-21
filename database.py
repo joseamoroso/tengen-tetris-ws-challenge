@@ -3,7 +3,8 @@ from sqlite3 import Error, connect
 
 class Database:
 	def __init__(self):
-		self.filename = os.environ['DB_FILENAME']
+		dbFilename = os.environ.get('DB_FILENAME', 'database.db')
+		self.filename = dbFilename
 
 	# Initializes the database.
 	def initialize(self):

@@ -1,6 +1,6 @@
 # Stage 1: Base
 # TODO: search for a lite version of the image
-FROM --platform=$BUILDPLATFORM python:3.9 AS base
+FROM --platform=$BUILDPLATFORM python:3.12.3-alpine3.19 AS base
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
@@ -17,8 +17,8 @@ FROM base AS builder
 # Copy source code
 COPY . .
 
-# Stage 3: Production
-FROM base AS production
+# Stage 3: Package
+FROM base AS package
 
 # Copy built code from builder stage
 COPY --from=builder /app .

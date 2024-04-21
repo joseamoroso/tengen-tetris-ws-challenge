@@ -22,6 +22,32 @@ Select level at the beginning (ech of you can select its own level) and play. Yo
 their movements. The same pieces will fall for both of you, even if you die and decide to try again.
 
 ## How to run it on your machine
+
+### OPTION 1 (Docker)
+
+This step requires Docker to be installed as a pre requirement in your machine. After confirming we have Docker installed, we execute the following commands:
+
+``` sh
+# Clone this repository locally
+git clone https://github.com/joseamoroso/tengen-tetris-ws-challenge
+
+cd tengen-tetris-ws-challenge
+
+# Build the docker image
+docker build -t tengen-tetris-ws-challenge-local .
+
+# Run the application in a container with Docker 
+docker run -p 8080:8080 jamorosoa/tengen-tetris-ws-challenge-local
+
+
+```
+
+Now use your browser and navigate to `localhost:8080`, and start playing 😀
+
+For __duo mode__ you will need find your local IP address by running `ip a`, and, from another computer within the same network, connect to `<ip>:8080`.
+
+### OPTION 2 (Python CLI)
+
 Instructions can only be provided for a Linux box, sorry. Also, specific instructions are given for an Ubuntu Server, although you will be able to figure out
 how to install it on any other Linux box.
 
