@@ -27,14 +27,14 @@ image:
   # -- Pull policy for the Docker image.
   pullPolicy: Always
   # -- Tag of the Docker image.
-  tag:
+  tag: "1.0.0"
 
-# -- Annotations for pods.
 podAnnotations: {}
 
 service:
   # -- Type of Kubernetes service.
   type: NodePort
+  port: 80
 
 ingress:
   # -- Specifies whether ingress should be enabled.
@@ -47,7 +47,7 @@ ingress:
     alb.ingress.kubernetes.io/target-type: ip
   # -- Hosts and paths for the ingress.
   hosts:
-    - host:
+    - host: wschallenge1.joseamoroso.com
       paths:
         - path: /
           pathType: Prefix
@@ -85,10 +85,10 @@ affinity: {}
 # -- Volume settings. Current configuration support EFS CSI driver
 volume:
   # -- Specifies whether volume should be enabled.
-  enabled: false
+  enabled: true
   # -- Name of the volume.
-  name:
+  name: data
   # -- Path where the volume is mounted inside the container.
-  path:
+  mountPath: /data
   # -- Server information if using an external volume. This id correspond to EFS volume generated in AWS. E.g. fs-xxxxxxxxxxxxxx
   server:

@@ -21,22 +21,23 @@ A Helm chart to deploy tengen-tetris app. Current implementation, requires AWS s
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"Always"` | Pull policy for the Docker image. |
 | image.repository | string | `"jamorosoa/tengen-tetris-ws-challenge-gh"` | Repository of the Docker image. |
-| image.tag | string | `nil` | Tag of the Docker image. |
+| image.tag | string | `"1.0.0"` | Tag of the Docker image. |
 | ingress.annotations | object | `{"alb.ingress.kubernetes.io/scheme":"internet-facing","alb.ingress.kubernetes.io/target-type":"ip"}` | Annotations for the ingress. Current configuration suports AWS Load Balancer controller for ingress. |
 | ingress.className | string | `"alb"` | Ingress class name. |
 | ingress.enabled | bool | `false` | Specifies whether ingress should be enabled. |
-| ingress.hosts | list | `[{"host":null,"paths":[{"path":"/","pathType":"Prefix"}]}]` | Hosts and paths for the ingress. |
+| ingress.hosts | list | `[{"host":"wschallenge1.joseamoroso.com","paths":[{"path":"/","pathType":"Prefix"}]}]` | Hosts and paths for the ingress. |
 | nameOverride | string | `""` | Overrides names. |
 | nodeSelector | object | `{}` | Node selector for pods. |
-| podAnnotations | object | `{}` | Annotations for pods. |
+| podAnnotations | object | `{}` |  |
 | replicaCount | int | `1` | Number of replicas for the application. |
 | resources | object | `{"limits":{"cpu":"1000m","memory":"256Mi"},"requests":{"cpu":"1000m","memory":"128Mi"}}` | Resource requests and limits for the pods. |
+| service.port | int | `80` |  |
 | service.type | string | `"NodePort"` | Type of Kubernetes service. |
 | tolerations | list | `[]` | Tolerations for pods. |
-| volume | object | `{"enabled":false,"name":null,"path":null,"server":null}` | Volume settings. Current configuration support EFS CSI driver |
-| volume.enabled | bool | `false` | Specifies whether volume should be enabled. |
-| volume.name | string | `nil` | Name of the volume. |
-| volume.path | string | `nil` | Path where the volume is mounted inside the container. |
+| volume | object | `{"enabled":true,"mountPath":"/data","name":"data","server":null}` | Volume settings. Current configuration support EFS CSI driver |
+| volume.enabled | bool | `true` | Specifies whether volume should be enabled. |
+| volume.mountPath | string | `"/data"` | Path where the volume is mounted inside the container. |
+| volume.name | string | `"data"` | Name of the volume. |
 | volume.server | string | `nil` | Server information if using an external volume. This id correspond to EFS volume generated in AWS. E.g. fs-xxxxxxxxxxxxxx |
 
 ----------------------------------------------

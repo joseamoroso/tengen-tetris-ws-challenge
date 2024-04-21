@@ -42,13 +42,17 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.volume.enabled }}
           volumeMounts:
-            - name: {{ .Values.volume.name }}
-              mountPath: {{ .Values.volume.path }}
+            name: {{ .Values.volume.name }}
+            mountPath: {{ .Values.volume.mountPath }}
+          {{- end }}
+      {{- if .Values.volume.enabled }}
       volumes:
         - name: {{ .Values.volume.name }}
           persistentVolumeClaim:
             claimName: efs-pvc
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

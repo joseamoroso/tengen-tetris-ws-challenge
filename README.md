@@ -39,14 +39,29 @@ docker build -t tengen-tetris-ws-challenge-local .
 # Run the application in a container with Docker 
 docker run -p 8080:8080 jamorosoa/tengen-tetris-ws-challenge-local
 
-
 ```
 
 Now use your browser and navigate to `localhost:8080`, and start playing 😀
 
 For __duo mode__ you will need find your local IP address by running `ip a`, and, from another computer within the same network, connect to `<ip>:8080`.
 
-### OPTION 2 (Python CLI)
+### OPTION 2 (Kubernetes)
+
+This method assumes you have a Kubernetes cluster already deployed (preferable in AWS) to run the application. Also, we'll manage the kubernetes resources with Helm, then you need to install kubectl and Helm in your machine to manage the Helm charts.
+
+Once you are authenticated in the kubernetes cluster run:
+
+``` sh
+# Clone this repository locally
+git clone https://github.com/joseamoroso/tengen-tetris-ws-challenge
+
+cd tengen-tetris-ws-challenge
+
+
+
+```
+
+### OPTION 3 (Python CLI)
 
 Instructions can only be provided for a Linux box, sorry. Also, specific instructions are given for an Ubuntu Server, although you will be able to figure out
 how to install it on any other Linux box.
