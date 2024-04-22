@@ -84,7 +84,8 @@ helm upgrade tengen-tetris charts/wschallenge
 If an application change is needed, update your source code and push the changes to Github (we assume pushs are made in the main branch for this example). The pipeline will do the rest, you only need to refer to the right tag after the image is published. For this we can use git tags, e.g. after a change was submitted to the main branch run:
 
 ```sh
-git push origin v1.0.0 
+git tag v1.0.0 
+git push origin v1.0.0
 ```
 
 Which generate the new image tag: `jamorosoa/tengen-tetris-ws-challenge-gh:v1.0.0`. Now we can update the tag in the [values.yaml](./charts/wschallenge/values.yaml) and run the `helm upgrade tengen-tetris charts/wschallenge` command again. This will generate a new release of the helm chart.

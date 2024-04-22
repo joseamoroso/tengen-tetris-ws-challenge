@@ -38,6 +38,7 @@ We use AWS EKS to provide the k8s cluster where we deploy the application. For t
 
 ### Repository walkthrough
 
+- The Helm chart is defined in the [charts/wschallenge](./charts/wschallenge/) directory. The rest of files corresponds to original `tengen-tetris` app.
 - For this challenge, we use a monorepo for the chart and app, but for production environments it's recommended to separate each one and have different values files for each environment. This also means that, for this instructions, the chart dependes on the [values.yaml](./charts/wschallenge/values.yaml) file for any configuration purpose.
 - Docker image is composed of three stages, to install dependencies, copy all files and ship the app in the container. The `BUILDPLATFORM` allows us to build images that can support multi-architectures in case we want to use ARM based images.
 - We used an alpine version because of the image security, size and simplicity of the application (doesn't requires much dependencies)
