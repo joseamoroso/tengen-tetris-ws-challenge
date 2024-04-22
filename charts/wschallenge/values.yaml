@@ -45,6 +45,7 @@ ingress:
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60
   # -- Hosts and paths for the ingress.
   hosts:
     - host: wschallenge1.joseamoroso.com
@@ -67,7 +68,7 @@ autoscaling:
   # -- Minimum number of replicas.
   minReplicas: 2
   # -- Maximum number of replicas.
-  maxReplicas: 10
+  maxReplicas: 2
   # -- Target CPU utilization percentage.
   targetCPUUtilizationPercentage: 70
   # -- Target memory utilization percentage.
@@ -91,4 +92,4 @@ volume:
   # -- Path where the volume is mounted inside the container.
   mountPath: /data
   # -- Server information if using an external volume. This id correspond to EFS volume generated in AWS. E.g. fs-xxxxxxxxxxxxxx
-  server: "fs-0d3b9e9f526f348d7"
+  server: "fs-0abfac6038897236d"
