@@ -5,19 +5,13 @@ For the instructions on how to deploy the application with helm charts please re
 
 ## Challenge
 
-[X] Run the application locally.
-
-[X] Build a Docker image with the webapp source code requirements and publish it in Dockerhub.
-
-[X] Create k8s manifests to deploy the application. Consider the architecture according to the use case and requirements.
-
-[X] Generate a Helm chart from k8s manifests created in the previous step. This chart should be customizable through values file.
-
-[X] Deploy the chart in the Kubernetes cluster and verify its working properly.
-
-[X] Add support for dynamic host ip and port values to the python app. These values should be passed from the Helm chart.
-
-[X] Deploy new version of the app and Helm chart to the cluster. This deployment should have a minimal impact in the app usage.
+- [X] Run the application locally.
+- [X] Build a Docker image with the webapp source code requirements and publish it in Dockerhub.
+- [X] Create k8s manifests to deploy the application. Consider the architecture according to the use case and requirements.
+- [X] Generate a Helm chart from k8s manifests created in the previous step. This chart should be customizable through values file.
+- [X] Deploy the chart in the Kubernetes cluster and verify its working properly.
+- [X] Add support for dynamic host ip and port values to the python app. These values should be passed from the Helm chart.
+- [X] Deploy new version of the app and Helm chart to the cluster. This deployment should have a minimal impact in the app usage.
 
 ## Architecture
 
