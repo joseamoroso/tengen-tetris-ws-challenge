@@ -44,7 +44,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- if .Values.volume.enabled }}
           volumeMounts:
-            name: {{ .Values.volume.name }}
+          - name: {{ .Values.volume.name }}
             mountPath: {{ .Values.volume.mountPath }}
           {{- end }}
       {{- if .Values.volume.enabled }}

@@ -23,8 +23,6 @@ FROM base AS package
 # Copy built code from builder stage
 COPY --from=builder /app .
 
-# Expose port
-EXPOSE 8080
 
 # Define command to run the application
 CMD ["python3", "application.py"]

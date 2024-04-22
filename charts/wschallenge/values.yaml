@@ -27,7 +27,7 @@ image:
   # -- Pull policy for the Docker image.
   pullPolicy: Always
   # -- Tag of the Docker image.
-  tag: "1.0.0"
+  tag: "latest"
 
 podAnnotations: {}
 
@@ -38,7 +38,7 @@ service:
 
 ingress:
   # -- Specifies whether ingress should be enabled.
-  enabled: false
+  enabled: true
   # -- Ingress class name.
   className: alb
   # -- Annotations for the ingress. Current configuration suports AWS Load Balancer controller for ingress.
@@ -55,10 +55,10 @@ ingress:
 # -- Resource requests and limits for the pods.
 resources:
   limits:
-    cpu: 1000m
+    cpu: 100m
     memory: 256Mi
   requests:
-    cpu: 1000m
+    cpu: 100m
     memory: 128Mi
 
 autoscaling:
@@ -91,4 +91,4 @@ volume:
   # -- Path where the volume is mounted inside the container.
   mountPath: /data
   # -- Server information if using an external volume. This id correspond to EFS volume generated in AWS. E.g. fs-xxxxxxxxxxxxxx
-  server:
+  server: "fs-0d3b9e9f526f348d7"

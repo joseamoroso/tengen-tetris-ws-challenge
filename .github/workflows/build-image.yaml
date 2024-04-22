@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - "master"
+    tags:
+      - 'v*'
 
 jobs:
   docker:
@@ -20,10 +22,17 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action
+        with:
+          images: jamorosoa/tengen-tetris-ws-challenge-gh
+        
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           platforms: linux/amd64
           push: true
-          tags: jamorosoa/tengen-tetris-ws-challenge-gh
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
