@@ -54,6 +54,7 @@ For __duo mode__ you will need find your local IP address by running `ip a`, and
 * Enable Volume (NFS): Requires [efs-csi-driver](https://github.com/kubernetes-sigs/aws-efs-csi-driver/tree/master/charts/aws-efs-csi-driver) and an EFS volume with the the right networks and permission settings to be used within the cluster.
 
 !!! Important !!!
+
 Previuos pre-requirements can be installed and setup by deploying the infrastructure with [tengen-tetris-ws-challenge-infra](https://github.com/joseamoroso/tengen-tetris-ws-challenge-infra) with the expection of the DNS record pointing to the ALB.
 
 This method assumes you have a Kubernetes cluster already deployed (preferable in AWS) to run the application. Also, we'll manage the kubernetes resources with Helm, then you'll need to install kubectl and Helm in your machine to manage the Helm charts.

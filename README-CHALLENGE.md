@@ -44,3 +44,15 @@ We use AWS EKS to provide the k8s cluster where we deploy the application. For t
 - We used an alpine version because of the image security, size and simplicity of the application (doesn't requires much dependencies)
 - The Gihub wokflow in this repository build and push the image to the public Docker repository: <https://hub.docker.com/repository/docker/jamorosoa/tengen-tetris-ws-challenge-gh> (it requires to defined the repository credentials as secrets). The image tag depends on the Github event. E.g. if we push tag v1.0.0, it will generate the image `jamorosoa/tengen-tetris-ws-challenge-gh:v1.0.0`
 - Because this is a minimal implementation no CD for Helm charts was implemented. However, the current approach could be used if we install ArgoCD to manage our apps and charts with GitOps.
+
+### Images/snippets from application
+
+![helm-insatallation](docs/images/wschallenge-doc-2.png)
+
+![update-record-to-ingress](docs/images/wschallenge-doc-3.png)
+
+![app-working-solo](docs/images/wschallenge-doc-4.png)
+
+![app-working-duo](docs/images/wschallenge-doc-5.png)
+
+![app-working-score-board](docs/images/wschallenge-doc-6.png)
